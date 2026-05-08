@@ -1240,6 +1240,7 @@ int main(){
                     }
                 }
                 if(verticalMenu==6){
+                    // Isto é um comentario COISAS ALEATORIAS 
                     cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓";
                     cout << "\n┃       Universidade do Vale do Itajaí - UNIVALI     ┃";
                     cout << "\n┃              Escola Politícnica  - POLI            ┃";
