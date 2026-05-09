@@ -1337,7 +1337,7 @@ int main(){
                                                 cout << "┃\e[93m  [Págin 2 - Trajes]     \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 3) {
-                                                cout << "┃\e[93m  [Página 3 - Passivos]   \e[0m┃\n";
+                                                cout << "┃\e[93m  [Págia 3 - Passivos]   \e[0m┃\n";
                                             }
                                             cout << "┃                          ┃\n";
                                         } else {
