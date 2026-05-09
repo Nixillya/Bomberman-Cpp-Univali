@@ -44,16 +44,6 @@ bool is_this_in(int y, int x, PositionType array[], int size){
     }
     return false;
 }
-bool is_this_in(PositionType array1[], int size1, PositionType array2[], int size2){
-    for(int i=0; i<size1; i++){
-        for(int j=0; j<size2; j++){
-            if(array1[i].Y == array2[j].Y && array1[i].X == array2[j].X){
-                return true;
-            }
-        }
-    }
-    return false;
-}
 
 bool verifier_explosion(int map[mapSizeY][mapSizeX], PositionType bombPos, int y, int x,int i=0){
     if(i>=1){
