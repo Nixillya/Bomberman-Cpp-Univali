@@ -45,7 +45,6 @@ bool is_this_in(int y, int x, PositionType array[], int size){
     return false;
 }
 
-
 bool verifier_explosion(int map[mapSizeY][mapSizeX], PositionType bombPos, int y, int x,int i=0){
     if(i>=1){
         y += (y!=0) ? y/VA(y) : 0;
