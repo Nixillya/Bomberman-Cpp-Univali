@@ -1331,7 +1331,7 @@ int main(){
                                         new_line("┣","━","┫",26);
                                         if (paginaVertical == 1) {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃\e[93m  [Página 1 - Explosivos] \e[0m┃\n";
+                                                cout << "┃\e[93m  [Págia 1 - Explosivos] \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
                                                 cout << "┃\e[93m  [Página 2 - Trajes]     \e[0m┃\n";
