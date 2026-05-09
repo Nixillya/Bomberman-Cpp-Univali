@@ -1376,7 +1376,7 @@ int main(){
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - Bomba padrão (◉): A bomba padrão é o seu explosivo básico, tem uma quantidade infinita no seu inventário. ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - C4 (▣): Um explosivo que pode ser detonado remotamente (sem time de detonação), uma caixa de C4 concede   ┃\n";
+                                                    cout << "┃ - C4 (▣): U explosivo que pode ser detonado remotamente (sem time de detonação), uma caixa de C4 concede   ┃\n";
                                                     cout << "┃    2 unidades, e podem ser implantadas ao mesmo tempo. Pressionar (R) vai detonar as C4. O raio de          ┃\n";
                                                     cout << "┃    explosão é igual da bomba padrão.                                                                        ┃\n";
                                                     new_line("┣","━","┫",109);
