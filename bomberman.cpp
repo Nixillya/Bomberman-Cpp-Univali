@@ -45,6 +45,7 @@ bool is_this_in(int y, int x, PositionType array[], int size){
     return false;
 }
 
+
 bool verifier_explosion(int map[mapSizeY][mapSizeX], PositionType bombPos, int y, int x,int i=0){
     if(i>=1){
         y += (y!=0) ? y/VA(y) : 0;
@@ -1331,13 +1332,13 @@ int main(){
                                         new_line("┣","━","┫",26);
                                         if (paginaVertical == 1) {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃\e[93m  [Págia 1 - Explosivos] \e[0m┃\n";
+                                                cout << "┃\e[93m  [Página 1 - Explosivos] \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
-                                                cout << "┃\e[93m  [Págin 2 - Trajes]     \e[0m┃\n";
+                                                cout << "┃\e[93m  [Página 2 - Trajes]     \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 3) {
-                                                cout << "┃\e[93m  [Págin 3 - Passivos]   \e[0m┃\n";
+                                                cout << "┃\e[93m  [Página 3 - Passivos]   \e[0m┃\n";
                                             }
                                             cout << "┃                          ┃\n";
                                         } else {
