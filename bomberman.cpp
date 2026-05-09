@@ -1325,7 +1325,7 @@ int main(){
                                         if (paginaHorizontal > 3) {
                                             paginaHorizontal = 1;
                                         }
-                                        cout << "\e[?25l\e[H";
+                                        cout << "\e[?25l\e[";
                                         new_line("┏","━","┓",26);
                                         cout << "┃       CODEX: ITEN       ┃\n";
                                         new_line("┣","━","┫",26);
