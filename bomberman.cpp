@@ -1368,7 +1368,7 @@ int main(){
                                             cout << "┃ [Voltar]                 ┃\n";
                                         }
                                         new_line("┗","━","┛",26);
-                                        cout<<"\e[?25l";
+                                        cout<<"\e[?25l"
                                         switch (paginaHorizontal) {
                                             case 1:
                                                     new_line("┏","━","┓",109);
