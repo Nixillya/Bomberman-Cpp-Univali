@@ -393,13 +393,12 @@ int game(int difficulty, int players,TimerType &timer, int &phase){
                 }
                 if(block){
                     for(int box=0; box<fragileWallQuantity; box++){
-                        
-                    }
-                    if(is_this_in(y,x,boxPos,fragileWallQuantity)){
-                        if(map[y][x] == freeArea){
-                            cout<<"\e[32;42m\e[38;5;94m\u25D9";
-                            block = false;
-                            continue;
+                        if(boxPos[box].Y==y && boxPos[box].X==x){
+                            if(map[y][x] == freeArea){
+                                cout<<"\e[32;42m\e[38;5;94m\u25D9";
+                                block = false;
+                                continue;
+                            }
                         }
                     }
                 }
