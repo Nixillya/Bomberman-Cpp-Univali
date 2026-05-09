@@ -80,7 +80,7 @@ void render_details(int passiveItem,TimerType timer, int itens[]){
     cout << timer.Sec;
     cout << "\e[2;"<<mapSizeX+12<<"H";
     if(timer.Min<10){
-        cout << 1;
+        cout << 0;
     }
     cout << timer.Min;
     cout << "\e[2;"<<mapSizeX+9<<"H";
