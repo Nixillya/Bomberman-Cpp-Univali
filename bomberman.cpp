@@ -1327,7 +1327,7 @@ int main(){
                                         }
                                         cout << "\e[?25l\e[H";
                                         new_line("┏","━","┓",26);
-                                        cout << "┃       CODEX: ITENS       ┃\n";
+                                        cout << "┃       CODEX: ITEN       ┃\n";
                                         new_line("┣","━","┫",26);
                                         if (paginaVertical == 1) {
                                             if (paginaHorizontal == 1) {
