@@ -449,24 +449,26 @@ int game(int difficulty, int players,TimerType &timer, int &phase){
                     return 0;
                 }
             }
-            if(is_this_in(playerPos.Y,playerPos.X,enemysPos,enemysQuantity)){
-                if(passiveItem==1){
-                    moveEnemy = clock();
-                    timerClock = clock();
-                    passiveItem = 0;
-                    invincible = 1;
-                    continue;
-                }else{
-                    return 0;
+            for(int enemy=0; enemy<enemysQuantity; enemy++){
+                if(playerPos.Y==enemysPos[enemy].Y && playerPos.X==enemysPos[enemy].X){
+                    if(passiveItem==1){
+                        moveEnemy = clock();
+                        timerClock = clock();
+                        passiveItem = 0;
+                        invincible = 1;
+                        continue;
+                    }else{
+                        return 0;
+                    }
                 }
-            }
-            if(passiveItem==2){
-                for(int y=-1; y<=1; y++){
-                    for(int x=-1; x<=1; x++){
-                        if(is_this_in(playerPos.Y+y,playerPos.X+x,enemysPos,enemysQuantity)){
-                            freezeEnemys = 3;
-                            passiveItem = 0;
-                            timerClock = clock();
+                if(passiveItem==2){
+                    for(int y=-1; y<=1; y++){
+                        for(int x=-1; x<=1; x++){
+                            if(playerPos.Y+y==enemysPos[enemy].Y && playerPos.X+x==enemysPos[enemy].X){
+                                freezeEnemys = 3;
+                                passiveItem = 0;
+                                timerClock = clock();
+                            }
                         }
                     }
                 }
@@ -591,7 +593,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase){
                                     }
                                 }
                                 if(((y>=-1&&x>=-1) && (y<=1&&x<=1)) || (y==0||x==0)){
-                                    if(map[playerPos.Y][playerPos.X]==bomb){
+                                    if(totalEnemys>0 || theres_bomb(bombsPos,maximumBombs)){
                                         if(y==-2 && x==0){
                                             if(map[playerPos.Y+y][playerPos.X+x]!=freeArea){
                                                 int y1 = y+1;
