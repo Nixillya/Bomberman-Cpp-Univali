@@ -1476,7 +1476,7 @@ int main(){
             }
             if(verticalMenu==6){
                 // AAAAAaaaaaaaa
-                //AAAAAaaadddds
+                //AAAAAaaaddsasdsdadffdsas
                 cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓";
                 cout << "\n┃       Universidade do Vale do Itajaí - UNIVALI     ┃";
                 cout << "\n┃              Escola Politícnica  - POLI            ┃";
