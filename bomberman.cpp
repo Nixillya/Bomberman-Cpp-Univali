@@ -11,7 +11,7 @@ using namespace std;
 #define solidWall 1
 #define fragileWall 2
 #define bomb 3
-#define explosion 5
+#define explosion 4
 
 struct PositionType{int X; int Y;int Time;int Range;int Type;int Move;};
 struct TimerType{int Sec;int Min; int Hour;};
