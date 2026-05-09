@@ -1327,17 +1327,17 @@ int main(){
                                         }
                                         cout << "\e[?25l\e[H";
                                         new_line("┏","━","┓",26);
-                                        cout << "┃       CODEX: ITEN       ┃\n";
+                                        cout << "┃       CODEX: ITENS       ┃\n";
                                         new_line("┣","━","┫",26);
                                         if (paginaVertical == 1) {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃\e[93m  [Págia 1 - Explosivos] \e[0m┃\n";
+                                                cout << "┃\e[93m  [Página 1 - Explosivos] \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
-                                                cout << "┃\e[93m  [Págin 2 - Trajes]     \e[0m┃\n";
+                                                cout << "┃\e[93m  [Página 2 - Trajes]     \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 3) {
-                                                cout << "┃\e[93m  [Págia 3 - Passivos]   \e[0m┃\n";
+                                                cout << "┃\e[93m  [Página 3 - Passivos]   \e[0m┃\n";
                                             }
                                             cout << "┃                          ┃\n";
                                         } else {
