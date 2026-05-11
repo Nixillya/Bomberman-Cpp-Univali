@@ -136,7 +136,7 @@ bool theres_bomb(PositionType bombsPos[], int maximumBombs){
     return false;
 }
 
-int game(int difficulty, int players,TimerType &timer, int &phase){
+int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTotalMoves, int &playerTotalBombs, int &playerPoints){
 
 //------------------------> VARIAVEIS GERAIS >------------------------//
 
@@ -980,7 +980,6 @@ int main(){
 
     while (running){
         bool menuCodex = true;
-        bool codexItens = true;
 
         cout << "\e[?25l\e[H";
         new_line("┏","━","┓",15);
@@ -1149,7 +1148,7 @@ int main(){
                     while(success){
                         cout<<"\ec\e[?25l";
                         int deadMenu = -1;
-                        if(game(difficulty,players,timer,phase)){
+                        if(game(difficulty,players,timer,phase,playerTotalMoves,playerTotalbombs,playerPoints)){
                             wait(100);
                             if(phase>3){
                                 deadMenu = 1;
