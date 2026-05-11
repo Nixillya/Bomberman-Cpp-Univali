@@ -1028,6 +1028,9 @@ int main(){
                     int players = 2;
                     int gameMenu = 1;
                     int phase = 1;
+                    int playerTotalMoves = 0;
+                    int playerTotalbombs = 0;
+                    int playerPoints = 0;
                     TimerType timer = {0,0,0};
                     while(true){
                         bool kill = false;
