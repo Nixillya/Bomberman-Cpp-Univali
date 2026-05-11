@@ -1,2 +1,2 @@
 # Bomberman
-bomberman da univali É
+bomberman da univali
