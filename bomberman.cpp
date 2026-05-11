@@ -19,7 +19,6 @@ struct EnemyType{int X; int Y;int Move;};
 struct PlayerType{int X; int Y;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;};
 struct TimerType{int Sec;int Min; int Hour;};
 
-
 const int mapSizeY = 15;
 const int mapSizeX = 25;
 

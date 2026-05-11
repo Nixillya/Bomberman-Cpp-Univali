@@ -1,2 +1,2 @@
 # Bomberman
-bomberman da univali
+Trabalho da univali com objetivo de aprendizado das habilidades e técnicas ensinadas na disciplina de Algoritmos e Programação II
