@@ -13,7 +13,10 @@ using namespace std;
 #define bomb 3
 #define explosion 4
 
-struct PositionType{int X; int Y;int Time;int Range;int Type;int Move;};
+struct PositionType{int X; int Y;};
+struct BombType{int X; int Y;int Time;int Range;int Type;};
+struct EnemyType{int X; int Y;int Move;};
+struct PlayerType{int X; int Y;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;};
 struct TimerType{int Sec;int Min; int Hour;};
 
 
@@ -36,7 +39,7 @@ void wait(int milisecunds){
     }
 }
 
-bool verifier_explosion(int map[mapSizeY][mapSizeX], PositionType bombPos, int y, int x,int i=0){
+bool verifier_explosion(int map[mapSizeY][mapSizeX], BombType bombPos, int y, int x,int i=0){
     if(i>=1){
         y += (y!=0) ? y/VA(y) : 0;
         x += (x!=0) ? x/VA(x) : 0;
@@ -63,7 +66,7 @@ void new_line(string x, string y, string z,int size){
     cout<<z<<endl;
 }
 
-void render_details(int passiveItem,TimerType timer, int itens[]){
+void render_details(int passiveItem,TimerType timer){
     cout << "\e[2;"<<mapSizeX+15<<"H";
     if(timer.Sec<10){
         cout << 0;
@@ -79,23 +82,6 @@ void render_details(int passiveItem,TimerType timer, int itens[]){
         cout << 0;
     }
     cout << timer.Hour;
-
-    cout<<"\e[6;"<<mapSizeX+4<<"H";
-    for(int i=0;i<5;i++){
-
-        if(itens[i]==0){
-            cout<<" ";
-        }
-        if(itens[i]==1){
-            cout<<"◈";
-        }
-        if(itens[i]==2){
-            cout<<"◉";
-        }
-        if(itens[i]==3){
-            cout<<"Ω";
-        }
-    }
 
     cout<<"\e[6;"<<mapSizeX+10<<"H";
     if(passiveItem==0){
@@ -127,13 +113,23 @@ void found_danger(int danger[4],int y,int x){
     }
 }
 
-bool theres_bomb(PositionType bombsPos[], int maximumBombs){
+bool theres_bomb(BombType bombsPos[], int maximumBombs){
     for(int bombs=0; bombs<maximumBombs; bombs++){
         if(bombsPos[bombs].Y!=-1 && bombsPos[bombs].X!=-1){
             return true;
         }
     }
     return false;
+}
+
+int count_bombs(BombType bombsPos[], int maximumBombs){
+    int totalbombs = 0;
+    for(int bombs=0; bombs<maximumBombs; bombs++){
+        if(bombsPos[bombs].Y!=-1 && bombsPos[bombs].X!=-1){
+            totalbombs++;    
+        }
+    }
+    return totalbombs;
 }
 
 int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTotalMoves, int &playerTotalBombs, int &playerPoints){
@@ -143,7 +139,6 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
     int mapSizeBy2 = ((mapSizeY/2)*(mapSizeX/2));
     int maximumBombs = mapSizeBy2/2;
 
-    int itens[5] = {0,0,0,0,0};
     int passiveItem = 0;
 
     int enemysQuantity;
@@ -161,7 +156,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
     }
     int moveEnemy = clock();
     int freezeEnemys = 0;
-    PositionType enemysPos[enemysQuantity];
+    EnemyType enemysPos[enemysQuantity];
 
     int fragileWallQuantity = 50;
     PositionType boxPos[fragileWallQuantity];
@@ -172,16 +167,15 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 
     int cpuMoves = clock();
 
-    PositionType playerPos;
+    PlayerType playerPos;
     int invincible = 2;
-    PositionType bombsPos[maximumBombs];
+    BombType bombsPos[maximumBombs];
     for(int i=0;i<maximumBombs;i++){
         bombsPos[i].Y = -1;
         bombsPos[i].X = -1;
         bombsPos[i].Range = 1;
         bombsPos[i].Time = 0;
     }
-    int actualBomb = 0;
     int timerClock = clock();
 
     int map[mapSizeY][mapSizeX];
@@ -262,7 +256,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
         }
     }
     for (int  i = 0; i < enemysQuantity; i++){ // Gera as posições dos enemysPos
-        PositionType enemy;   // Posição do inimigo
+        EnemyType enemy;   // Posição do inimigo
         while(true){ // Gera uma posição aleatoria para o inimigo e faz as verificações para não gerar o inimigo emcima do playerPos, de outros enemysPos ou em blocos proibidos
             bool success = false;
             enemy.Y = rand()%mapSizeY;
@@ -324,8 +318,8 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 
 //---------------------------> RENDERIZAÇÃO DO MAPA >---------------------------//
     while(true){
-        if(actualBomb>=maximumBombs){
-            actualBomb = 0;
+        if(playerPos.ActualBomb>=maximumBombs){
+            playerPos.ActualBomb = 0;
         }
         cout << "\e[?25l\e[1;1H";
         new_line("┏","━","┓",mapSizeX);
@@ -433,7 +427,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             cout << "\e[0m┃\n";
         }
         new_line("┗","━","┛",mapSizeX);
-        render_details(passiveItem,timer,itens);
+        render_details(passiveItem,timer);
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
 //----------------------> SISTEMA DO PLAYER >----------------------//
@@ -474,36 +468,12 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                 }
             }
         }
-        for(int i=0;i<5;i++){
-            if(i>0){
-                if(itens[i]!=0){
-                    if(itens[i-1]==0){
-                        itens[i-1]=itens[i];
-                        itens[i] = 0;
-                    }
-                }
-            }
-        }
         for(int box=0;box<fragileWallQuantity;box++){
             if(playerPos.Y==boxPos[box].Y && playerPos.X==boxPos[box].X){
                 boxPos[box].Y = -1;
                 boxPos[box].X = -1;
                 if(rand()%10!=0 || passiveItem!=0){
-                    for(int i=0;i<5;i++){
-                        if(itens[i]==0){
-                            bool success = false;
-                            int item;
-                            while(!success){
-                                success = true;
-                                item = rand()%3+1;
-                                if(rand()%5!=0 && item==3){
-                                    success = false;
-                                }
-                            }
-                            itens[i] = item;
-                            break;
-                        }
-                    }
+
                 }else{
                     bool success = false;
                     while(!success){
@@ -732,24 +702,11 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     playerPos.X -= target.X;
                 }
             }
-            if(key == 32 && (map[playerPos.Y][playerPos.X]==freeArea) && invincible==0 && (bombsPos[actualBomb].Y == -1 && bombsPos[actualBomb].X == -1)){
-                bool multiBomb = false;
-                if(itens[0]==2 && theres_bomb(bombsPos,maximumBombs)){
-                    multiBomb = true;
-                    itens[0] = 0;
-                }
-                if(!theres_bomb(bombsPos,maximumBombs) || multiBomb){
-                    if(itens[0]==1){
-                        bombsPos[actualBomb].Range=2;
-                        itens[0] = 0;
-                    }
-                    if(itens[0]==3){
-                        bombsPos[actualBomb].Range=(mapSizeX+mapSizeY);
-                        itens[0] = 0;
-                    }
-                    bombsPos[actualBomb].Y = playerPos.Y;
-                    bombsPos[actualBomb].X = playerPos.X;
-                    bombsPos[actualBomb].Time = clock();
+            if(key == 32 && (map[playerPos.Y][playerPos.X]==freeArea) && invincible==0 && (bombsPos[playerPos.ActualBomb].Y == -1 && bombsPos[playerPos.ActualBomb].X == -1)){
+                if(count_bombs(bombsPos,maximumBombs)<playerPos.MaxBombs){
+                    bombsPos[playerPos.ActualBomb].Y = playerPos.Y;
+                    bombsPos[playerPos.ActualBomb].X = playerPos.X;
+                    bombsPos[playerPos.ActualBomb].Time = clock();
                 }
             }
         }
@@ -907,9 +864,9 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 //----------------------------< SISTEMA DOS INIMIGOS <----------------------------//
 
 //-----------------------------------> SISTEMA DAS BOMBAS >-----------------------------------//
-        actualBomb++;
+        playerPos.ActualBomb++;
         for(int i=0;i<maximumBombs;i++){
-            PositionType explosionPos;
+            BombType explosionPos;
             if(map[bombsPos[i].Y][bombsPos[i].X]==freeArea){
                 map[bombsPos[i].Y][bombsPos[i].X] = bomb;
             }
