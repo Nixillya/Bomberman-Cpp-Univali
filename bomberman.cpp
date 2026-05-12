@@ -74,12 +74,19 @@ bool explode(int map[mapSizeY][mapSizeX], BombType bomb, int y, int x,int &playe
         return false;
     }else{
         i++;
-        if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock || i>=bomb.Range){
+        if(bomb.Range!=1000){
+            if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock || i>=bomb.Range){
+                if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock){
+                    playerPoints+=50;
+                }
+                map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
+                return false;
+            }
+        }else{
             if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock){
+                map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
                 playerPoints+=50;
             }
-            map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
-            return false;
         }
         map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
         explode(map,bomb,y,x,playerPoints,i);
@@ -165,6 +172,9 @@ void render_details(TimerType timer,PlayerType player,int playerTotalMoves, int 
     }
     if(player.Item==2){
         cout<<"⬘";
+    }
+    if(player.Item==3){
+        cout<<"Ω";
     }
 }
 
@@ -559,7 +569,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                 }else{
                     bool success = false;
                     while(!success){
-                        int item = rand()%2+1;
+                        int item = rand()%3+1;
                         player.Item = item;
                         success = true;
                     }
@@ -957,6 +967,9 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
         player.ActualBomb++;
         for(int bomb=0;bomb<maximumBombs;bomb++){
             bombs[bomb].Range = player.MaxRange;
+            if(player.Item==3){
+                bombs[bomb].Range = 1000;
+            }
             if(map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X]==freeBlock){
                 map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = bombBlock;
             }
