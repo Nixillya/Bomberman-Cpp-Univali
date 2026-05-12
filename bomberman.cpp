@@ -15,8 +15,8 @@ using namespace std;
 
 struct PositionType{int X=-1; int Y=-1;};
 struct BombType{int X=-1; int Y=-1;int Time=0;int Range;int Type;};
-struct EnemyType{int X; int Y;int Move;};
-struct PlayerType{int X; int Y;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;};
+struct EnemyType{int X=-1; int Y=-1;int Move;};
+struct PlayerType{int X=-1; int Y=-1;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;};
 struct TimerType{int Sec;int Min; int Hour;};
 
 const int mapSizeY = 15;
@@ -86,6 +86,9 @@ void render_details(int passiveItem,TimerType timer,PlayerType playerPos,int pla
     cout << timer.Hour;
 
     cout<<"\e[2;"<<mapSizeX+20<<"H";
+    if(playerPoints<1000000){
+        cout<<0;
+    }
     if(playerPoints<100000){
         cout<<0;
     }
