@@ -13,11 +13,38 @@ using namespace std;
 #define bombBlock 3
 #define explosionBlock 4
 
-struct PositionType{int X=-1; int Y=-1;};
-struct BombType{PositionType Pos;int Time=0;int Range;int Type;};
-struct EnemyType{PositionType Pos;int Move;};
-struct PlayerType{PositionType Pos;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;int Invincible=2;};
-struct TimerType{int Sec;int Min; int Hour;};
+struct PositionType{
+    int X=-1; 
+    int Y=-1;
+};
+
+struct BombType{
+    PositionType Pos;
+    int Time=0;
+    int Range;
+    int Type;
+};
+
+struct EnemyType{
+    PositionType Pos;
+    int Move;
+};
+
+struct PlayerType{
+    PositionType Pos;
+    int MaxBombs=1;
+    int MaxRange=1;
+    int Lifes=1;
+    int ActualBomb=0;
+    int Invincible=2;
+    int Item=0;
+};
+
+struct TimerType{
+    int Sec;
+    int Min;
+    int Hour;
+};
 
 const int mapSizeY = 15;
 const int mapSizeX = 25;
@@ -179,9 +206,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 
 //------------------------> VARIAVEIS GERAIS >------------------------//
 
-    int mapSizeBy2 = ((mapSizeY/2)*(mapSizeX/2));
-    int maximumBombs = mapSizeBy2/2;
-
+    int maximumBombs = 25;
     int passiveItem = 0;
 
     int enemysQuantity;
