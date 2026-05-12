@@ -16,7 +16,7 @@ using namespace std;
 struct PositionType{int X=-1; int Y=-1;};
 struct BombType{int X=-1; int Y=-1;int Time=0;int Range;int Type;};
 struct EnemyType{int X=-1; int Y=-1;int Move;};
-struct PlayerType{int X=-1; int Y=-1;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;};
+struct PlayerType{int X=-1; int Y=-1;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;int Invincible=2;};
 struct TimerType{int Sec;int Min; int Hour;};
 
 const int mapSizeY = 15;
@@ -207,7 +207,6 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
     int cpuMoves = clock();
 
     PlayerType playerPos;
-    int invincible = 2;
     BombType bombsPos[maximumBombs];
     BombType explosionPos[maximumBombs]; 
     int timerClock = clock();
@@ -398,7 +397,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                         if(map[playerPos.Y][playerPos.X] == explosion){
                             cout << "\e[97;43m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
                         }else{
-                            if(invincible==0){
+                            if(playerPos.Invincible==0){
                                 if(map[playerPos.Y][playerPos.X] == fragileWall){
                                         cout << "\e[97;42m\e[48;5;245m\u25CF"; // PLAYER
                                         passiveItem = 0;
@@ -468,7 +467,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
 //----------------------> SISTEMA DO PLAYER >----------------------//
-        if(invincible==0){
+        if(playerPos.Invincible==0){
             if (map[playerPos.Y][playerPos.X] == explosion){
                 playerPos.Lifes--;
                 playerPoints-=200;
@@ -476,7 +475,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     moveEnemy = clock();
                     timerClock = clock();
                     passiveItem = 0;
-                    invincible = 1;
+                    playerPos.Invincible = 1;
                     continue;
                 }else{
                     if(playerPoints<0){
@@ -494,7 +493,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                             moveEnemy = clock();
                             timerClock = clock();
                             passiveItem = 0;
-                            invincible = 1;
+                            playerPos.Invincible = 1;
                             continue;
                         }else{
                             if(playerPoints<0){
@@ -565,7 +564,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     for(int y=-1;y<=1;y++){
                         for(int x=-1;x<=1;x++){
                             if((y==0||x==0)){
-                                if(passiveItem==2 && invincible==0){
+                                if(passiveItem==2 && playerPos.Invincible==0){
                                     if(map[playerPos.Y+y][playerPos.X+x]!=freeArea && map[playerPos.Y+y][playerPos.X+x]!=fragileWall){
                                         found_danger(danger,y,x);
                                     }
@@ -750,7 +749,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             }
             playerPos.Y += target.Y;
             playerPos.X += target.X;
-            if(passiveItem==2 && invincible==0){
+            if(passiveItem==2 && playerPos.Invincible==0){
                 if(map[playerPos.Y][playerPos.X] != freeArea && map[playerPos.Y][playerPos.X] != explosion && map[playerPos.Y][playerPos.X] != fragileWall){
                     playerPos.Y -= target.Y;
                     playerPos.X -= target.X;
@@ -767,7 +766,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     playerPoints-=1;
                 }
             }
-            if(key == 32 && (map[playerPos.Y][playerPos.X]==freeArea) && invincible==0 && (bombsPos[playerPos.ActualBomb].Y == -1 && bombsPos[playerPos.ActualBomb].X == -1)){
+            if(key == 32 && (map[playerPos.Y][playerPos.X]==freeArea) && playerPos.Invincible==0 && (bombsPos[playerPos.ActualBomb].Y == -1 && bombsPos[playerPos.ActualBomb].X == -1)){
                 if(count_bombs(bombsPos,maximumBombs)<playerPos.MaxBombs){
                     playerTotalBombs++;
                     playerPoints-=10;
@@ -972,8 +971,8 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 
 //------------------------------> TIMER >------------------------------//
         if((clock()-timerClock)>=1000){
-            if(invincible>0){
-                invincible--;
+            if(playerPos.Invincible>0){
+                playerPos.Invincible--;
             }
             if(freezeEnemys>0){
                 freezeEnemys--;
