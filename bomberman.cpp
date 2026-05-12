@@ -14,7 +14,7 @@ using namespace std;
 #define explosion 4
 
 struct PositionType{int X=-1; int Y=-1;};
-struct BombType{int X=-1; int Y=-1;int Time;int Range;int Type;};
+struct BombType{int X=-1; int Y=-1;int Time=0;int Range;int Type;};
 struct EnemyType{int X; int Y;int Move;};
 struct PlayerType{int X; int Y;int MaxBombs=1;int MaxRange=1;int Lifes=1;int ActualBomb=0;};
 struct TimerType{int Sec;int Min; int Hour;};
@@ -65,7 +65,7 @@ void new_line(string x, string y, string z,int size){
     cout<<z<<endl;
 }
 
-void render_details(int passiveItem,TimerType timer){
+void render_details(int passiveItem,TimerType timer,PlayerType playerPos){
     cout << "\e[2;"<<mapSizeX+15<<"H";
     if(timer.Sec<10){
         cout << 0;
@@ -81,6 +81,8 @@ void render_details(int passiveItem,TimerType timer){
         cout << 0;
     }
     cout << timer.Hour;
+    cout<<"\e[6;"<<mapSizeX+4<<"H";
+    cout<<"◉-"<<playerPos.MaxBombs<<"";
 
     cout<<"\e[6;"<<mapSizeX+10<<"H";
     if(passiveItem==0){
@@ -165,6 +167,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
     PlayerType playerPos;
     int invincible = 2;
     BombType bombsPos[maximumBombs];
+    BombType explosionPos[maximumBombs]; 
     int timerClock = clock();
 
     int map[mapSizeY][mapSizeX];
@@ -378,7 +381,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     for(int box=0; box<fragileWallQuantity; box++){
                         if(boxPos[box].Y==y && boxPos[box].X==x){
                             if(map[y][x] == freeArea){
-                                cout<<"\e[32;42m\e[38;5;94m\u25D9";
+                                cout<<"\e[32;42m\e[38;5;94m\u25CE";
                                 block = false;
                                 continue;
                             }
@@ -416,7 +419,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             cout << "\e[0m┃\n";
         }
         new_line("┗","━","┛",mapSizeX);
-        render_details(passiveItem,timer);
+        render_details(passiveItem,timer,playerPos);
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
 //----------------------> SISTEMA DO PLAYER >----------------------//
@@ -860,7 +863,6 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 //-----------------------------------> SISTEMA DAS BOMBAS >-----------------------------------//
         playerPos.ActualBomb++;
         for(int i=0;i<maximumBombs;i++){
-            BombType explosionPos;
             bombsPos[i].Range = playerPos.MaxRange;
             if(map[bombsPos[i].Y][bombsPos[i].X]==freeArea){
                 map[bombsPos[i].Y][bombsPos[i].X] = bomb;
@@ -871,10 +873,12 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                 explode(map,bombsPos[i],0,1);
                 explode(map,bombsPos[i],-1,0);
                 explode(map,bombsPos[i],0,-1);
-            }
-            if(bombsPos[i].Y>0 && bombsPos[i].X>0 && ((clock()-bombsPos[i].Time) >= 1350)){
+                explosionPos[i] = bombsPos[i];
                 bombsPos[i].Y = -1;
                 bombsPos[i].X = -1;
+                bombsPos[i].Time = 0;
+            }
+            if(explosionPos[i].Y>0 && explosionPos[i].X>0 && ((clock()-explosionPos[i].Time) >= 1350)){
                 for(int enemys = 0; enemys<enemysQuantity; enemys++){
                     if (map[enemysPos[enemys].Y][enemysPos[enemys].X] == explosion) {
                         enemysPos[enemys].Y = -1;
@@ -888,7 +892,9 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                         }
                     }
                 }
-
+                explosionPos[i].Y = -1;
+                explosionPos[i].X = -1;
+                explosionPos[i].Time = 0;
             }
         }
 //-----------------------------------< SISTEMA DAS BOMBAS <-----------------------------------//
