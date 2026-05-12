@@ -487,7 +487,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             cout << "\e[0m┃\n";
         }
         new_line("┗","━","┛",mapSizeX);
-        render_details(player.Item,timer,player,playerTotalMoves,playerTotalBombs,playerPoints);
+        render_details(timer,player,playerTotalMoves,playerTotalBombs,playerPoints);
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
 //----------------------> SISTEMA DO PLAYER >----------------------//
@@ -505,7 +505,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     if(playerPoints<0){
                         playerPoints=0;
                     }
-                    render_details(player.Item,timer,player,playerTotalMoves,playerTotalBombs,playerPoints);
+                    render_details(timer,player,playerTotalMoves,playerTotalBombs,playerPoints);
                     return 0;
                 }
             }else{
@@ -523,7 +523,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                             if(playerPoints<0){
                                 playerPoints=0;
                             }
-                            render_details(player.Item,timer,player,playerTotalMoves,playerTotalBombs,playerPoints);
+                            render_details(timer,player,playerTotalMoves,playerTotalBombs,playerPoints);
                             return 0;
                         }
                     }
@@ -1201,12 +1201,12 @@ int main(){
                             wait(100);
                             if(phase>3){
                                 deadMenu = 1;
-                                cout<<"\e[9;"<<mapSizeX+3<<"H";
+                                cout<<"\e[13;"<<mapSizeX+3<<"H";
                                 cout << "┃ PLAYER VENCEU!     ┃\n";
                             }
                         }else{
                             wait(100);
-                            cout<<"\e[9;"<<mapSizeX+3<<"H";
+                            cout<<"\e[13;"<<mapSizeX+3<<"H";
                             cout << "┃ PLAYER PERDEU!     ┃\n";
                             deadMenu = 1;
                             timer = {0,0,0};
@@ -1215,27 +1215,27 @@ int main(){
                             playerTotalbombs = 0;
                             playerPoints = 0;
                         }
-                        cout<<"\e[8;"<<mapSizeX+3<<"H";
+                        cout<<"\e[12;"<<mapSizeX+3<<"H";
                         new_line("┏","━","┓",20);
-                        cout<<"\e[10;"<<mapSizeX+3<<"H";
+                        cout<<"\e[14;"<<mapSizeX+3<<"H";
                         new_line("┃"," ","┃",20);
 
                         if(deadMenu==1){
                             while(true){
                                 bool kill = false;
-                                cout<<"\e[11;"<<mapSizeX+3<<"H";
+                                cout<<"\e[15;"<<mapSizeX+3<<"H";
                                 if(deadMenu==1){
                                     cout<<"┃\e[93m  [REINICIAR]       \e[0m┃\n";
                                 }else{
                                     cout<<"┃ [REINICIAR]        ┃\n";
                                 }
-                                cout<<"\e[12;"<<mapSizeX+3<<"H";
+                                cout<<"\e[16;"<<mapSizeX+3<<"H";
                                 if(deadMenu==2){
                                     cout<<"┃\e[93m  [MENU]            \e[0m┃\n";
                                 }else{
                                     cout<<"┃ [MENU]             ┃\n";
                                 }
-                                cout<<"\e[13;"<<mapSizeX+3<<"H";
+                                cout<<"\e[17;"<<mapSizeX+3<<"H";
                                 new_line("┗","━","┛",20);
                                 int key = getch();
                                 switch(key){
