@@ -33,4 +33,5 @@ Trabalho desenvolvido por alunos da universidade do vale de itajaí com objetivo
     ❌ - O Jogo deve ter a opção de um segundo Jogador 
     ❌ - Colocar música no jogo 
     ❌ - Criar arquivo, manipular: ler, inserir e dados
-    ❌ - Struct e Template
+    ❌ - Struct
+    ❌ - Template
