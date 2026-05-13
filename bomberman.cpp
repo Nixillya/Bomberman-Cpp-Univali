@@ -13,25 +13,29 @@ using namespace std;
 #define bombBlock 3
 #define explosionBlock 4
 
-struct PositionType{
+struct XY{
     int X=-1; 
     int Y=-1;
 };
 
+struct PositionType{
+    XY Pos;
+};
+
 struct BombType{
-    PositionType Pos;
+    XY Pos;
     int Time=0;
     int Range;
     int Type;
 };
 
 struct EnemyType{
-    PositionType Pos;
+    XY Pos;
     int Move;
 };
 
 struct PlayerType{
-    PositionType Pos;
+    XY Pos;
     int MaxBombs=1;
     int MaxRange=1;
     int Lifes=1;
@@ -76,16 +80,12 @@ bool explode(int map[mapSizeY][mapSizeX], BombType bomb, int y, int x,int &playe
         i++;
         if(bomb.Range!=1000){
             if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock || i>=bomb.Range){
-                if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock){
-                    playerPoints+=50;
-                }
                 map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
                 return false;
             }
         }else{
             if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock){
                 map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
-                playerPoints+=50;
             }
         }
         map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
@@ -234,7 +234,8 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
     EnemyType enemys[enemysQuantity];
 
     int fragileWallQuantity = 50;
-    PositionType boxPos[fragileWallQuantity];
+    PositionType boxs[fragileWallQuantity];
+    PositionType portal;
 
     PlayerType player;
     int cpuMoves = clock();
@@ -277,27 +278,43 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
         for (int i=0; i < fragileWallQuantity; i++){
             PositionType fragil;
             while(true){
-                fragil.Y = rand()%mapSizeY;
-                fragil.X = rand()%mapSizeX;
-                if (map[fragil.Y][fragil.X] == freeBlock){
+                fragil.Pos.Y = rand()%mapSizeY;
+                fragil.Pos.X = rand()%mapSizeX;
+                if (map[fragil.Pos.Y][fragil.Pos.X] == freeBlock){
                     bool success = false;
                     for(int y=-1;y<=1;y++){
                         for(int x=-1;x<=1;x++){
                             if(y==0 || x==0){
-                                if(map[fragil.Y+y][fragil.X+x] == fragileBlock || map[fragil.Y+y][fragil.X+x] == solidBlock){
+                                if(map[fragil.Pos.Y+y][fragil.Pos.X+x] == fragileBlock || map[fragil.Pos.Y+y][fragil.Pos.X+x] == solidBlock){
                                     success = true;
                                 }
                             }
                         }
                     }
                     if(success){
-                        map[fragil.Y][fragil.X] = fragileBlock;
+                        map[fragil.Pos.Y][fragil.Pos.X] = fragileBlock;
                         if(rand()%4==0){
-                            boxPos[i].Y=fragil.Y;
-                            boxPos[i].X=fragil.X;
+                            boxs[i].Pos.Y=fragil.Pos.Y;
+                            boxs[i].Pos.X=fragil.Pos.X;
                         }
                         break;
                     }
+                }
+            }
+        }
+        while(true){ // Gera a posição do Portal
+            bool success = false;
+            portal.Pos.Y = rand()%mapSizeY,
+            portal.Pos.X = rand()%mapSizeX;
+            if(map[portal.Pos.Y][portal.Pos.X] == fragileBlock){ // Verifica se a posição do player é uma area livre, se for, ele faz uma verificação para não gerar o player perto de paredes frageis
+                success = true;
+                for(int box=0;box<fragileWallQuantity;box++){
+                    if(portal.Pos.Y == boxs[box].Pos.Y && portal.Pos.X == boxs[box].Pos.X){
+                        success = false;
+                    }
+                }
+                if(success){
+                    break;
                 }
             }
         }
@@ -440,9 +457,9 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                                 }
                             }else{
                                 if(rand()%2){
-                                    cout << "\e[0;42m\e[38;5;51m\u25CF";
+                                    cout << "\e[0;42m\e[38;5;21m\u25CF";
                                 }else{
-                                    cout << "\e[0;42m\e[38;5;159m\u25CF";
+                                    cout << "\e[0;42m\e[38;5;51m\u25CF";
                                 }
                             }
                         }
@@ -456,10 +473,23 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     }
                 }
                 if(block){
+                    if(portal.Pos.Y==y && portal.Pos.X==x){
+                        if(map[y][x] == freeBlock){
+                            if(rand()%2){
+                                cout << "\e[32;42m\e[38;5;93m\u25CF";
+                                continue;
+                            }else{
+                                cout << "\e[32;42m\e[38;5;207m\u25CF";
+                                continue;
+                            }
+                        }
+                    }
+                }
+                if(block){
                     for(int box=0; box<fragileWallQuantity; box++){
-                        if(boxPos[box].Y==y && boxPos[box].X==x){
+                        if(boxs[box].Pos.Y==y && boxs[box].Pos.X==x){
                             if(map[y][x] == freeBlock){
-                                cout<<"\e[32;42m\e[38;5;94m\u25CE";
+                                cout<<"\e[32;42m\e[38;5;3m\u25CF";
                                 block = false;
                                 continue;
                             }
@@ -501,6 +531,10 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
 //----------------------> SISTEMA DO PLAYER >----------------------//
+        if(player.Pos.Y == portal.Pos.Y && player.Pos.X == portal.Pos.X){
+            phase++;
+            return 1;
+        }
         if(player.Invincible==0){
             if (map[player.Pos.Y][player.Pos.X] == explosionBlock){
                 player.Lifes--;
@@ -552,9 +586,9 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             }
         }
         for(int box=0;box<fragileWallQuantity;box++){
-            if(player.Pos.Y==boxPos[box].Y && player.Pos.X==boxPos[box].X){
-                boxPos[box].Y = -1;
-                boxPos[box].X = -1;
+            if(player.Pos.Y==boxs[box].Pos.Y && player.Pos.X==boxs[box].Pos.X){
+                boxs[box].Pos.Y = -1;
+                boxs[box].Pos.X = -1;
                 if(rand()%10!=0 || player.Item!=0){
                     int item = rand()%3;
                     if(item==0){
@@ -579,8 +613,8 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 
         if (kbhit() || players==1){
             PositionType target;
-            target.Y = 0;
-            target.X = 0;
+            target.Pos.Y = 0;
+            target.Pos.X = 0;
             int key;
 
             if(players==2){
@@ -590,11 +624,10 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             if(players==1){
                 key = 0;
                 int danger[4] = {-1,-1,-1,-1};
-                if((clock()-cpuMoves) >= 25){
+                if((clock()-cpuMoves) >= 0){
                     cpuMoves = clock();
                     int totalEnemys = 0;
                     bool putBomb = false;
-                    int nearEnemy = false;
                     for(int y=-1;y<=1;y++){
                         for(int x=-1;x<=1;x++){
                             if((y==0||x==0)){
@@ -612,7 +645,6 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                                     if((player.Pos.Y+y == enemys[enemy].Pos.Y && player.Pos.X+x == enemys[enemy].Pos.X)){
                                         found_danger(danger,y,x);
                                         putBomb = true;
-                                        nearEnemy = true;
                                     }
                                     int Y = 0;
                                     int X = 0;
@@ -630,7 +662,6 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                                     }
                                     if(((player.Pos.Y+y == enemys[enemy].Pos.Y+Y && player.Pos.X+x == enemys[enemy].Pos.X+X) && freezeEnemys==0)){
                                         putBomb = true;
-                                        nearEnemy = true;
                                         found_danger(danger,y,x);
                                     }
                                 }
@@ -655,7 +686,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                                     }
                                 }
                                 if(((y>=-1&&x>=-1) && (y<=1&&x<=1)) || (y==0||x==0)){
-                                    if(totalEnemys>0 || theres_bomb(bombs,maximumBombs)){
+                                    if(totalEnemys>0 || map[player.Pos.Y][player.Pos.X]==bombBlock){
                                         if(y==-2 && x==0){
                                             if(map[player.Pos.Y+y][player.Pos.X+x]!=freeBlock){
                                                 int y1 = y+1;
@@ -717,7 +748,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     for(int i=0;i<4;i++){
                         safes += (danger[i]==-1) ? 1 : 0;
                     }
-                    if(rand()%5==0 && !theres_bomb(bombs,maximumBombs) && totalEnemys<=1 && !nearEnemy){
+                    if(rand()%2==0 && !theres_bomb(bombs,maximumBombs) && totalEnemys>=1){
                         int enemyChoiced = -1;
                         for(int enemy=0;enemy<enemysQuantity;enemy++){
                             if(enemys[enemy].Pos.X==-1 && enemys[enemy].Pos.Y==-1){
@@ -769,36 +800,34 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 //----------------------< CPU PLAYER <----------------------//
             switch(key){
                 case 119: // Cima
-                    target.Y--;
+                    target.Pos.Y--;
                     break;
                 case 115: // Baixo
-                    target.Y++;
+                    target.Pos.Y++;
                     break;
                 case 97: // Esquerda
-                    target.X--;
+                    target.Pos.X--;
                     break;
                 case 100: // Direira
-                    target.X++;
+                    target.Pos.X++;
                     break;
             }
-            player.Pos.Y += target.Y;
-            player.Pos.X += target.X;
+            player.Pos.Y += target.Pos.Y;
+            player.Pos.X += target.Pos.X;
             if(key!=0){
                 if(player.Item==2 && player.Invincible==0){
                     if(map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock && map[player.Pos.Y][player.Pos.X] != fragileBlock){
-                        player.Pos.Y -= target.Y;
-                        player.Pos.X -= target.X;
+                        player.Pos.Y -= target.Pos.Y;
+                        player.Pos.X -= target.Pos.X;
                     }else{
                         playerTotalMoves++;
-                        playerPoints-=1;
                     }
                 }else{
                     if((map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock)){ // Testa colisão e cancela o movimento se verdadeiro
-                        player.Pos.Y -= target.Y;
-                        player.Pos.X -= target.X;
+                        player.Pos.Y -= target.Pos.Y;
+                        player.Pos.X -= target.Pos.X;
                     }else{
                         playerTotalMoves++;
-                        playerPoints-=1;
                     }
                 }
                 if(key == 32 && (map[player.Pos.Y][player.Pos.X]==freeBlock) && player.Invincible==0 && (bombs[player.ActualBomb].Pos.Y == -1 && bombs[player.ActualBomb].Pos.X == -1)){
@@ -816,9 +845,10 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 
 //----------------------------> SISTEMA DOS INIMIGOS >----------------------------//
         if(((clock()-moveEnemy) >= 350) && freezeEnemys==0){
-            int actualEnemys = 0;
+            // int actualEnemys = 0;
             moveEnemy = clock();
             for(int enemy = 0; enemy<enemysQuantity; enemy++){
+                /*
                 if(enemys[enemy].Pos.Y == -1 && enemys[enemy].Pos.X == -1){
                     if (enemy == enemysQuantity-1) {
                         if (actualEnemys == 0){
@@ -830,11 +860,11 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                     continue;
                 }
                 actualEnemys++;
-
+                */
                 for(int box=0;box<fragileWallQuantity;box++){
-                    if(enemys[enemy].Pos.Y == boxPos[box].Y && enemys[enemy].Pos.X == boxPos[box].X){
-                        boxPos[box].Y = -1;
-                        boxPos[box].X = -1;
+                    if(enemys[enemy].Pos.Y == boxs[box].Pos.Y && enemys[enemy].Pos.X == boxs[box].Pos.X){
+                        boxs[box].Pos.Y = -1;
+                        boxs[box].Pos.X = -1;
                     }
                 }
 
