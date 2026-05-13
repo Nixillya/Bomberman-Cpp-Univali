@@ -783,30 +783,32 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             }
             player.Pos.Y += target.Y;
             player.Pos.X += target.X;
-            if(player.Item==2 && player.Invincible==0){
-                if(map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock && map[player.Pos.Y][player.Pos.X] != fragileBlock){
-                    player.Pos.Y -= target.Y;
-                    player.Pos.X -= target.X;
+            if(key!=0){
+                if(player.Item==2 && player.Invincible==0){
+                    if(map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock && map[player.Pos.Y][player.Pos.X] != fragileBlock){
+                        player.Pos.Y -= target.Y;
+                        player.Pos.X -= target.X;
+                    }else{
+                        playerTotalMoves++;
+                        playerPoints-=1;
+                    }
                 }else{
-                    playerTotalMoves++;
-                    playerPoints-=1;
+                    if((map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock)){ // Testa colisão e cancela o movimento se verdadeiro
+                        player.Pos.Y -= target.Y;
+                        player.Pos.X -= target.X;
+                    }else{
+                        playerTotalMoves++;
+                        playerPoints-=1;
+                    }
                 }
-            }else{
-                if((map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock)){ // Testa colisão e cancela o movimento se verdadeiro
-                    player.Pos.Y -= target.Y;
-                    player.Pos.X -= target.X;
-                }else{
-                    playerTotalMoves++;
-                    playerPoints-=1;
-                }
-            }
-            if(key == 32 && (map[player.Pos.Y][player.Pos.X]==freeBlock) && player.Invincible==0 && (bombs[player.ActualBomb].Pos.Y == -1 && bombs[player.ActualBomb].Pos.X == -1)){
-                if(count_bombs(bombs,maximumBombs)<player.MaxBombs){
-                    playerTotalBombs++;
-                    playerPoints-=10;
-                    bombs[player.ActualBomb].Pos.Y = player.Pos.Y;
-                    bombs[player.ActualBomb].Pos.X = player.Pos.X;
-                    bombs[player.ActualBomb].Time = clock();
+                if(key == 32 && (map[player.Pos.Y][player.Pos.X]==freeBlock) && player.Invincible==0 && (bombs[player.ActualBomb].Pos.Y == -1 && bombs[player.ActualBomb].Pos.X == -1)){
+                    if(count_bombs(bombs,maximumBombs)<player.MaxBombs){
+                        playerTotalBombs++;
+                        playerPoints-=10;
+                        bombs[player.ActualBomb].Pos.Y = player.Pos.Y;
+                        bombs[player.ActualBomb].Pos.X = player.Pos.X;
+                        bombs[player.ActualBomb].Time = clock();
+                    }
                 }
             }
         }
@@ -968,6 +970,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
         for(int bomb=0;bomb<maximumBombs;bomb++){
             bombs[bomb].Range = player.MaxRange;
             if(player.Item==3){
+                player.Item = 0;
                 bombs[bomb].Range = 1000;
             }
             if(map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X]==freeBlock){
