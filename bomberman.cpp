@@ -238,6 +238,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
     PositionType portal;
 
     PlayerType player;
+    PlayerType player2;
     int cpuMoves = clock();
 
     int maximumBombs = 25;

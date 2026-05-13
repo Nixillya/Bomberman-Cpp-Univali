@@ -29,7 +29,7 @@ Trabalho desenvolvido por alunos da universidade do vale de itajaí com objetivo
     ❌ - O Jogo ser salvado em um arquivo
     ❌ - No último nível deve ter 1 inimigo especial que execute movimentos mais inteligentes
     ❌ - Deve-se ter um portal para a próxima Fase
-    ❌ - Deve ter um boss.
+    ❌ - Deve ter um boss
     ❌ - O Jogo deve ter a opção de um segundo Jogador 
     ❌ - Colocar música no jogo 
     ❌ - Criar arquivo, manipular: ler, inserir e dados
