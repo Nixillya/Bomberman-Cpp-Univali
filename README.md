@@ -2,26 +2,26 @@
 - Curso de Ciência da Computação .
 - Matéria de Algoritmos e Programação II.
 
-Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho da matéria de Algoritmos e Programação II (e não criamos um nome legal para o nosso jogo).
+Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho da matéria de Algoritmos e Programação II.
 
 > STATUS: EM DESENVOLVIMENTO ⚠️
 
-# M1 (primeira versão do jogo):
-    (✓) - O jogador deverá se mover por todas as posições livres e de bomba.
-    (✓) - O jogador poderá colocar bombas na posição em que está.
-    (✓) - O jogador irá morrer se estiver na área de explosão de uma bomba ou se colidir com algum inimigo.
-    (✓) - Os inimigos, de tempos em tempos, irá se moverem 1,2 ou 3 quadrados em uma direção aleatória livre ou até encontrar um obstáculo.
-    (✓) - Os inimigos morrem se colidirem com a bomba se estiver na área da bomba quando ela explodir.
-    (✓) - A bomba deverá ser colocada no cenário pelo jogador e deverá explodir depois de um tempo.
-    (✓) - Apenas uma bomba poderá estar presente no cenário do jogo. Dessa forma, o jogador não poderá colocar outra bomba até que a anterior tenh detonado.
-    (✓) - A explosão deverá ser visível no jogo.
-    (✓) - Quando a bomba explodir deverá destruir todos os jogadores e inimigos que estiverem em sua proximidade, além de quebrar paredes frágeis.
-    (✓) - A explosão não poderá quebrar paredes sólidas.
-    (✓) - O cenário do jogo deverá ser composto por paredes sólidas e por paredes frágeis. 
-    (✓) - Todas as paredes deverão impedir a passagem do jogador e dos inimigos.
-    (✓) - As paredes frágeis poderão ser quebradas por bombas.
-    (✓) - O jogador irá vencer se estiver vivo quando todos os inimigos tiverem morrido.
-    (✓) - O jogador perde se morrer para um inimigo ou para a explosão da bomba.
+# M1:
+    ✅ - O jogador deverá se mover por todas as posições livres e de bomba.
+    ✅ - O jogador poderá colocar bombas na posição em que está.
+    ✅ - O jogador irá morrer se estiver na área de explosão de uma bomba ou se colidir com algum inimigo.
+    ✅ - Os inimigos, de tempos em tempos, irá se moverem 1,2 ou 3 quadrados em uma direção aleatória livre ou até encontrar um obstáculo.
+    ✅ - Os inimigos morrem se colidirem com a bomba se estiver na área da bomba quando ela explodir.
+    ✅ - A bomba deverá ser colocada no cenário pelo jogador e deverá explodir depois de um tempo.
+    ✅ - Apenas uma bomba poderá estar presente no cenário do jogo. Dessa forma, o jogador não poderá colocar outra bomba até que a anterior tenh detonado.
+    ✅ - A explosão deverá ser visível no jogo.
+    ✅ - Quando a bomba explodir deverá destruir todos os jogadores e inimigos que estiverem em sua proximidade, além de quebrar paredes frágeis.
+    ✅ - A explosão não poderá quebrar paredes sólidas.
+    ✅ - O cenário do jogo deverá ser composto por paredes sólidas e por paredes frágeis. 
+    ✅ - Todas as paredes deverão impedir a passagem do jogador e dos inimigos.
+    ✅ - As paredes frágeis poderão ser quebradas por bombas.
+    ✅ - O jogador irá vencer se estiver vivo quando todos os inimigos tiverem morrido.
+    ✅ - O jogador perde se morrer para um inimigo ou para a explosão da bomba.
 
 # M2
     ✅ - O Jogo deve estar otimizado.
