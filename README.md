@@ -40,18 +40,18 @@ Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho d
     ✅ - Ter opção do computador jogar sozinho.
     ✅ - Inserir itens especiais, que deve ser exibido embaixo das caixas quebradas.
     ✅ - Ter informações em Tela.
-    ✅ - Ter a pontuação em Tela, contagem de movimento, contagem da quantidade de bombas usadas.
+    ✅ - Ter a pontuação em Tela, contagem de movimento, contagem da quantidade de bombas usadas
+    ✅ - Deve-se ter um portal para a próxima Fase
+    ✅ - O Jogo deve ter a opção de um segundo Jogador 
     ✅ - Parâmetro Default e Sobrecarga.
     ✅ - Recursividade.
+    ✅ - Struct
 
     ❌ - Ter opção explicando a pontuação
     ❌ - Ter opção mostrando o Rank Ordenado
     ❌ - O Jogo ser salvado em um arquivo
     ❌ - No último nível deve ter 1 inimigo especial que execute movimentos mais inteligentes
-    ❌ - Deve-se ter um portal para a próxima Fase
     ❌ - Deve ter um boss
-    ❌ - O Jogo deve ter a opção de um segundo Jogador 
     ❌ - Colocar música no jogo 
     ❌ - Criar arquivo, manipular: ler, inserir e dados
-    ❌ - Struct
     ❌ - Template

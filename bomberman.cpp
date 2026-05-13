@@ -340,6 +340,26 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
             }
         }
     }
+    while(true){ // Gera a posição do jogador
+        bool success = false;
+        player2.Pos.Y = rand()%mapSizeY,
+        player2.Pos.X = rand()%mapSizeX;
+        if (map[player2.Pos.Y][player2.Pos.X] == freeBlock){ // Verifica se a posição do player é uma area livre, se for, ele faz uma verificação para não gerar o player perto de paredes frageis
+            success = true;
+            for (int y = -1; y < 2; y++){
+                for (int x = -1; x < 2; x++){ // Passa por uma matriz 3x3 em volta do player
+                    if(y==0 || x==0){ // Verifica se tem uma parede fragil em volta do player, se tiver, ele gera outra posição
+                        if (map[player2.Pos.Y+y][player2.Pos.X+x] == fragileBlock){
+                            success = false;
+                        }
+                    }
+                }
+            }
+            if(success){
+                break;
+            }
+        }
+    }
     for (int  i = 0; i < enemysQuantity; i++){ // Gera as posições dos enemys
         EnemyType enemy;   // Posição do inimigo
         while(true){ // Gera uma posição aleatoria para o inimigo e faz as verificações para não gerar o inimigo emcima do player, de outros enemys ou em blocos proibidos
