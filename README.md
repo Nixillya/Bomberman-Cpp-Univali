@@ -6,7 +6,7 @@ Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho d
 
 > STATUS: EM DESENVOLVIMENTO ⚠️
 
-# M1:
+# M1
     ✅ - O jogador deverá se mover por todas as posições livres e de bomba.
     ✅ - O jogador poderá colocar bombas na posição em que está.
     ✅ - O jogador irá morrer se estiver na área de explosão de uma bomba ou se colidir com algum inimigo.
