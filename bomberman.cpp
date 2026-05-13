@@ -141,7 +141,7 @@ void render_details(TimerType timer,PlayerType player,int playerTotalMoves, int 
     cout<<playerPoints;
 
     cout<<"\e[3;"<<mapSizeX+4<<"H";
-    cout<<playerTotalMoves<<" "<<playerTotalBombs<<" ";
+    cout<<"      "<<playerTotalMoves<<"---"<<playerTotalBombs<<" ";
 
     cout<<"\e[6;"<<mapSizeX+4<<"H";
     cout<<"◉:";
