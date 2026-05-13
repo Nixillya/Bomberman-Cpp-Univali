@@ -242,7 +242,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
 
     int maximumBombs = 25;
     BombType bombs[maximumBombs];
-    BombType explosion[maximumBombs]; 
+    BombType explosions[maximumBombs]; 
 
     int timerClock = clock();
 
@@ -1012,12 +1012,12 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                 explode(map,bombs[bomb],0,1,playerPoints);
                 explode(map,bombs[bomb],-1,0,playerPoints);
                 explode(map,bombs[bomb],0,-1,playerPoints);
-                explosion[bomb] = bombs[bomb];
+                explosions[bomb] = bombs[bomb];
                 bombs[bomb].Pos.Y = -1;
                 bombs[bomb].Pos.X = -1;
                 bombs[bomb].Time = 0;
             }
-            if(explosion[bomb].Pos.Y>0 && explosion[bomb].Pos.X>0 && ((clock()-explosion[bomb].Time) >= 1350)){
+            if(explosions[bomb].Pos.Y>0 && explosions[bomb].Pos.X>0 && ((clock()-explosions[bomb].Time) >= 1350)){
                 for(int enemy = 0; enemy<enemysQuantity; enemy++){
                     if(map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X] == explosionBlock){
                         playerPoints+=200;
@@ -1032,9 +1032,9 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                         }
                     }
                 }
-                explosion[bomb].Pos.Y = -1;
-                explosion[bomb].Pos.X = -1;
-                explosion[bomb].Time = 0;
+                explosions[bomb].Pos.Y = -1;
+                explosions[bomb].Pos.X = -1;
+                explosions[bomb].Time = 0;
             }
         }
 //-----------------------------------< SISTEMA DAS BOMBAS <-----------------------------------//
