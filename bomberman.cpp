@@ -591,11 +591,11 @@ int game(int difficulty, int players, TimerType &timer, int &phase, int &playerT
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
 //----------------------> SISTEMA DO PLAYER >----------------------//
-        if(player1.Pos.Y == portal.Pos.Y && player1.Pos.X == portal.Pos.X){
+        if((player1.Pos.Y == portal.Pos.Y && player1.Pos.X == portal.Pos.X) || (player2.Pos.Y == portal.Pos.Y && player2.Pos.X == portal.Pos.X)){
             phase++;
             return 1;
         }
-        if((player1.Pos.Y == -1 && player1.Pos.X == -1) && (player2.Pos.Y == -1 && player2.Pos.X == -1)){
+        if((player1.Pos.Y == -2 && player1.Pos.X == -2) && (player2.Pos.Y == -2 && player2.Pos.X == -2)){
             return 0;
         }
         if (map[player1.Pos.Y][player1.Pos.X] == explosionBlock && player1.Invincible==0){
@@ -1332,11 +1332,11 @@ int main(){
                             if(phase>3){
                                 deadMenu = 1;
                                 cout<<"\e[13;"<<mapSizeX+3<<"H";
-                                cout << "┃ PLAYER VENCEU!     ┃\n";
+                                cout << "┃ VITORIA!     ┃\n";
                             }
                         }else{
                             cout<<"\e[13;"<<mapSizeX+3<<"H";
-                            cout << "┃ PLAYER PERDEU!     ┃\n";
+                            cout << "┃ DERROTA!     ┃\n";
                             deadMenu = 1;
                             timer = {0,0,0};
                             phase = 1;
