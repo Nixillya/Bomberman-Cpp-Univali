@@ -13,6 +13,7 @@ using namespace std;
 #define bombBlock 3
 #define explosionBlock 4
 
+
 struct XY{
     int X=-1; 
     int Y=-1;
@@ -50,10 +51,12 @@ struct TimerType{
     int Hour;
 };
 
+
 const int mapSizeY = 15;
 const int mapSizeX = 25;
 
-int VA(int number){
+template<typename Any>
+int VA(Any number){
     if(number<0){
         number*=-1;
     }
