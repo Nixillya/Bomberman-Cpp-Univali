@@ -389,7 +389,7 @@ int game(int difficulty, int players,TimerType &timer, int &phase, int &playerTo
                         }
                     }
                     if(success){
-                        enemys[i] = {enemy};
+                        enemys[i] = enemy;
                         break;
                     }
                 }
