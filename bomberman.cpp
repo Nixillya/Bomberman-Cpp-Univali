@@ -619,7 +619,6 @@ int game(InfoType &info){
                 if(info.player1Points<0){
                     info.player1Points=0;
                 }
-                render_details(info,player1,player2);
                 player1.Pos.Y = -2;
                 player1.Pos.X = -2;
                 info.player1Alive = false;
@@ -639,7 +638,6 @@ int game(InfoType &info){
                     if(info.player1Points<0){
                         info.player1Points=0;
                     }
-                    render_details(info,player1,player2);
                     player1.Pos.Y = -2;
                     player1.Pos.X = -2;
                     info.player1Alive = false;
@@ -688,7 +686,6 @@ int game(InfoType &info){
                 if(info.player2Points<0){
                     info.player2Points=0;
                 }
-                render_details(info,player1,player2);
                 player2.Pos.Y = -2;
                 player2.Pos.X = -2;
                 info.player2Alive = false;
@@ -708,7 +705,6 @@ int game(InfoType &info){
                     if(info.player2Points<0){
                         info.player2Points=0;
                     }
-                    render_details(info,player1,player2);
                     player2.Pos.Y = -2;
                     player2.Pos.X = -2;
                     info.player2Alive = false;
