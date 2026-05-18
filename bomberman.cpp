@@ -35,6 +35,11 @@ struct EnemyType{
     int Move;
 };
 
+struct BossType{
+    XY Pos;
+    int HP;
+};
+
 struct PlayerType{
     XY Pos;
     int MaxBombs=1;
@@ -110,23 +115,23 @@ void new_line(string x, string y, string z,int size){
 }
 
 void render_details(InfoType info,PlayerType player1,PlayerType player2){
-    cout << "\e[2;"<<mapSizeX+15<<"H";
+    cout << "\e[2;"<<mapSizeX+36<<"H";
     if(info.timer.Sec<10){
         cout << 0;
     }
     cout << info.timer.Sec;
-    cout << "\e[2;"<<mapSizeX+12<<"H";
+    cout << "\e[2;"<<mapSizeX+33<<"H";
     if(info.timer.Min<10){
         cout << 0;
     }
     cout << info.timer.Min;
-    cout << "\e[2;"<<mapSizeX+9<<"H";
+    cout << "\e[2;"<<mapSizeX+30<<"H";
     if(info.timer.Hour<10){
         cout << 0;
     }
     cout << info.timer.Hour;
 
-    cout<<"\e[2;"<<mapSizeX+20<<"H";
+    cout<<"\e[2;"<<mapSizeX+16<<"H";
     if(info.player1Points<1000000){
         cout<<0;
     }
@@ -147,11 +152,11 @@ void render_details(InfoType info,PlayerType player1,PlayerType player2){
     }
     cout<<info.player1Points;
 
-    cout<<"\e[3;"<<mapSizeX+4<<"H";
-    cout<<"      "<<info.player1TotalMoves<<"---"<<info.player1Totalbombs<<" ";
+    cout<<"\e[2;"<<mapSizeX+4<<"H";
+    cout<<"["<<info.player1TotalMoves<<"]["<<info.player1Totalbombs<<"]";
 
-    cout<<"\e[6;"<<mapSizeX+4<<"H";
-    cout<<"◉:";
+    cout<<"\e[3;"<<mapSizeX+4<<"H";
+    cout<<"[◉:";
     if(player1.MaxBombs<10){
         cout<<"0"<<player1.MaxBombs;
     }else{
@@ -169,19 +174,80 @@ void render_details(InfoType info,PlayerType player1,PlayerType player2){
     }else{
         cout<<player1.Lifes;
     }
+    cout<<"]";
 
-    cout<<"\e[6;"<<mapSizeX+19<<"H";
+    cout<<"\e[3;"<<mapSizeX+20<<"H";
     if(player1.Item==0){
-        cout<<" ";
+        cout<<"[ ]";
     }
     if(player1.Item==1){
-        cout<<"◊";
+        cout<<"[◊]";
     }
     if(player1.Item==2){
-        cout<<"⬘";
+        cout<<"[⬘]";
     }
     if(player1.Item==3){
-        cout<<"Ω";
+        cout<<"[Ω]";
+    }
+    if(info.players==3){
+        cout<<"\e[6;"<<mapSizeX+16<<"H";
+        if(info.player2Points<1000000){
+            cout<<0;
+        }
+        if(info.player2Points<100000){
+            cout<<0;
+        }
+        if(info.player2Points<10000){
+            cout<<0;
+        }
+        if(info.player2Points<1000){
+            cout<<0;
+        }
+        if(info.player2Points<100){
+            cout<<0;
+        }
+        if(info.player2Points<10){
+            cout<<0;
+        }
+        cout<<info.player2Points;
+
+        cout<<"\e[6;"<<mapSizeX+4<<"H";
+        cout<<"["<<info.player2TotalMoves<<"]["<<info.player2Totalbombs<<"]";
+
+        cout<<"\e[7;"<<mapSizeX+4<<"H";
+        cout<<"[◉:";
+        if(player2.MaxBombs<10){
+            cout<<"0"<<player2.MaxBombs;
+        }else{
+            cout<<player2.MaxBombs;
+        }
+        cout<<" ◈:";
+        if(player2.MaxRange<10){
+            cout<<"0"<<player2.MaxRange;
+        }else{
+            cout<<player2.MaxRange;
+        }
+        cout<<" ☤:";
+        if(player2.Lifes<10){
+            cout<<"0"<<player2.Lifes;
+        }else{
+            cout<<player2.Lifes;
+        }
+        cout<<"]";
+
+        cout<<"\e[7;"<<mapSizeX+20<<"H";
+        if(player2.Item==0){
+            cout<<"[ ]";
+        }
+        if(player2.Item==1){
+            cout<<"[◊]";
+        }
+        if(player2.Item==2){
+            cout<<"[⬘]";
+        }
+        if(player2.Item==3){
+            cout<<"[Ω]";
+        }
     }
 }
 
@@ -281,9 +347,6 @@ void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[],
             }
         }
     }
-    if (player.Lifes < 0){
-        player.Lifes == 0;
-    }
     for (int box = 0; box < fragileWallQuantity; box++){
         if (player.Pos.Y == boxs[box].Pos.Y && player.Pos.X == boxs[box].Pos.X){
             boxs[box].Pos.Y = -1;
@@ -320,12 +383,10 @@ void bombs_explosion(BombType bombs[], int bomb, PlayerType &player, int map[map
         player.Item = 0;
         bombs[bomb].Range = 1000;
     }
-    if (map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] == freeBlock)
-    {
+    if (map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] == freeBlock){
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = bombBlock;
     }
-    if (bombs[bomb].Pos.Y > 0 && bombs[bomb].Pos.X > 0 && ((clock() - bombs[bomb].Time) >= 1000))
-    {
+    if (bombs[bomb].Pos.Y > 0 && bombs[bomb].Pos.X > 0 && ((clock() - bombs[bomb].Time) >= 1000)){
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = explosionBlock;
         explode(map, bombs[bomb], 1, 0);
         explode(map, bombs[bomb], 0, 1);
@@ -336,12 +397,9 @@ void bombs_explosion(BombType bombs[], int bomb, PlayerType &player, int map[map
         bombs[bomb].Pos.X = -1;
         bombs[bomb].Time = 0;
     }
-    if (explosions[bomb].Pos.Y > 0 && explosions[bomb].Pos.X > 0 && ((clock() - explosions[bomb].Time) >= 1350))
-    {
-        for (int enemy = 0; enemy < enemysQuantity; enemy++)
-        {
-            if (map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X] == explosionBlock)
-            {
+    if (explosions[bomb].Pos.Y > 0 && explosions[bomb].Pos.X > 0 && ((clock() - explosions[bomb].Time) >= 1350)){
+        for (int enemy = 0; enemy < enemysQuantity; enemy++){
+            if (map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X] == explosionBlock){
                 if(who==1){
                     info.player1Points += 200;
                 }else{
@@ -351,12 +409,9 @@ void bombs_explosion(BombType bombs[], int bomb, PlayerType &player, int map[map
                 enemys[enemy].Pos.X = -1;
             }
         }
-        for (int y = 0; y < mapSizeY; y++)
-        {
-            for (int x = 0; x < mapSizeX; x++)
-            {
-                if (map[y][x] == explosionBlock)
-                {
+        for (int y = 0; y < mapSizeY; y++){
+            for (int x = 0; x < mapSizeX; x++){
+                if (map[y][x] == explosionBlock){
                     map[y][x] = freeBlock;
                 }
             }
@@ -381,12 +436,10 @@ int game(InfoType &info)
     if(info.difficulty==3){
         enemysQuantity = 7*info.phase;
     }
-    if(info.phase==3){
-        enemysQuantity=1;
-    }
     int moveEnemy = clock();
     int freezeEnemys = 0;
     EnemyType enemys[enemysQuantity];
+    BossType boss;
 
     int fragileWallQuantity = 50;
     PositionType boxs[fragileWallQuantity];
@@ -514,18 +567,18 @@ int game(InfoType &info)
     }
     for (int  i = 0; i < enemysQuantity; i++){ // Gera as posições dos enemys
         EnemyType enemy;   // Posição do inimigo
-        while(true){ // Gera uma posição aleatoria para o inimigo e faz as verificações para não gerar o inimigo emcima do player1, de outros enemys ou em blocos proibidos
-            bool success = false;
-            enemy.Pos.Y = rand()%mapSizeY;
-            enemy.Pos.X = rand()%mapSizeX;
-            enemy.Move = 0;
-            for (int otherEnemy = 0; otherEnemy < enemysQuantity; otherEnemy++){
-                if (enemy.Pos.X == enemys[otherEnemy].Pos.X && enemy.Pos.Y == enemys[otherEnemy].Pos.Y){
-                    enemy.Pos.Y = player1.Pos.Y;
-                    enemy.Pos.X = player1.Pos.X;
+        if(info.phase!=3){
+            while(true){ // Gera uma posição aleatoria para o inimigo e faz as verificações para não gerar o inimigo emcima do player1, de outros enemys ou em blocos proibidos
+                bool success = false;
+                enemy.Pos.Y = rand()%mapSizeY;
+                enemy.Pos.X = rand()%mapSizeX;
+                enemy.Move = 0;
+                for (int otherEnemy = 0; otherEnemy < enemysQuantity; otherEnemy++){
+                    if (enemy.Pos.X == enemys[otherEnemy].Pos.X && enemy.Pos.Y == enemys[otherEnemy].Pos.Y){
+                        enemy.Pos.Y = player1.Pos.Y;
+                        enemy.Pos.X = player1.Pos.X;
+                    }
                 }
-            }
-            if(enemy.Pos.X != player1.Pos.X && enemy.Pos.Y != player1.Pos.Y) {
                 if(map[enemy.Pos.Y][enemy.Pos.X] == freeBlock){
                     success = true;
                     for (int y = -1; y < 2; y++){
@@ -541,6 +594,27 @@ int game(InfoType &info)
                         enemys[i] = enemy;
                         break;
                     }
+                }  
+            }
+        }else{
+            while(true){ // Gera uma posição aleatoria para o inimigo e faz as verificações para não gerar o inimigo emcima do player1, de outros enemys ou em blocos proibidos
+                bool success = false;
+                boss.Pos.Y = rand()%mapSizeY;
+                boss.Pos.X = rand()%mapSizeX;
+                if(map[boss.Pos.Y][boss.Pos.X] == freeBlock){
+                    success = true;
+                    for (int y = -1; y < 2; y++){
+                        for (int x = -1; x < 2; x++){
+                            if(y==0 || x==0){
+                                if (map[boss.Pos.Y+y][boss.Pos.X+x] == fragileBlock){
+                                    success = false;
+                                }
+                            }
+                        }
+                    }
+                    if(success){
+                        break;
+                    }
                 }
             }
         }
@@ -549,28 +623,30 @@ int game(InfoType &info)
 
 //------------------------> BORDAS LATERAIS >------------------------//
     cout<<"\e[1;"<<mapSizeX+3<<"H";
-    new_line("┏","━","┓",23);
+    new_line("┏","━","┓",19);
     cout<<"\e[2;"<<mapSizeX+3<<"H";
-    new_line("┃"," ","┃",23);
+    new_line("┃"," ","┃",19);
     cout<<"\e[3;"<<mapSizeX+3<<"H";
-    new_line("┃"," ","┃",23);
+    new_line("┃"," ","┃",19);
     cout<<"\e[4;"<<mapSizeX+3<<"H";
-    new_line("┗","━","┛",23);
-    cout << "\e[2;"<<mapSizeX+3<<"H";
-    cout << "┃["<<info.phase<<"] [00:00:00]";
-
-    cout<<"\e[5;"<<mapSizeX+3<<"H";
-    new_line("┏","━","┳",14);
-    cout<<"\e[6;"<<mapSizeX+3<<"H";
-    new_line("┃"," ","┃",14);
-    cout<<"\e[7;"<<mapSizeX+3<<"H";
-    new_line("┗","━","┻",14);
-    cout<<"\e[5;"<<mapSizeX+18<<"H";
-    new_line("┳","━","┓",1);
-    cout<<"\e[6;"<<mapSizeX+18<<"H";
-    new_line("┃"," ","┃",1);
-    cout<<"\e[7;"<<mapSizeX+18<<"H";
-    new_line("┻","━","┛",1);
+    new_line("┗","━","┛",19);
+    if(info.players==3){
+        cout<<"\e[5;"<<mapSizeX+3<<"H";
+        new_line("┏","━","┓",19);
+        cout<<"\e[6;"<<mapSizeX+3<<"H";
+        new_line("┃"," ","┃",19);
+        cout<<"\e[7;"<<mapSizeX+3<<"H";
+        new_line("┃"," ","┃",19);
+        cout<<"\e[8;"<<mapSizeX+3<<"H";
+        new_line("┗","━","┛",19);
+    }
+    
+    cout << "\e[1;"<<mapSizeX+24<<"H";
+    new_line("┏","━","┓",14);
+    cout << "\e[2;"<<mapSizeX+24<<"H";
+    cout << "┃["<<info.phase<<"] [00:00:00]┃";
+    cout << "\e[3;"<<mapSizeX+24<<"H";
+    new_line("┗","━","┛",14);
 //------------------------< BORDAS LATERAIS <------------------------//
 
 //---------------------------> RENDERIZAÇÃO DO MAPA >---------------------------//
@@ -583,6 +659,19 @@ int game(InfoType &info)
         }
         if(info.player1Points<0){
             info.player1Points=0;
+        }
+        if(info.player2Points<0){
+            info.player2Points=0;
+        }
+        if(!info.player1Alive){
+            player1.MaxBombs=0;
+            player1.MaxRange=0;
+            player1.Lifes=0;
+        }
+        if(!info.player2Alive){
+            player2.MaxBombs=0;
+            player2.MaxRange=0;
+            player2.Lifes=0;
         }
         cout << "\e[?25l\e[1;1H";
         new_line("┏","━","┓",mapSizeX);
@@ -930,34 +1019,38 @@ int game(InfoType &info)
                 }
             }
 //----------------------< CPU PLAYER <----------------------//
-            switch(key){
-                case 119: // Cima
-                    target1.Pos.Y--;
-                    break;
-                case 115: // Baixo
-                    target1.Pos.Y++;
-                    break;
-                case 97: // Esquerda
-                    target1.Pos.X--;
-                    break;
-                case 100: // Direita
-                    target1.Pos.X++;
-                    break;
+            if(info.player1Alive){
+                switch(key){
+                    case 119: // Cima
+                        target1.Pos.Y--;
+                        break;
+                    case 115: // Baixo
+                        target1.Pos.Y++;
+                        break;
+                    case 97: // Esquerda
+                        target1.Pos.X--;
+                        break;
+                    case 100: // Direita
+                        target1.Pos.X++;
+                        break;
+                }
             }
             if(info.players==3){
-                switch(key){
-                    case 72: // Cima
-                        target2.Pos.Y--;
-                        break;
-                    case 80: // Baixo
-                        target2.Pos.Y++;
-                        break;
-                    case 75: // Esquerda
-                        target2.Pos.X--;
-                        break;
-                    case 77: // Direita
-                        target2.Pos.X++;
-                        break;
+                if(info.player2Alive){
+                    switch(key){
+                        case 72: // Cima
+                            target2.Pos.Y--;
+                            break;
+                        case 80: // Baixo
+                            target2.Pos.Y++;
+                            break;
+                        case 75: // Esquerda
+                            target2.Pos.X--;
+                            break;
+                        case 77: // Direita
+                            target2.Pos.X++;
+                            break;
+                    }
                 }
             }
             player1.Pos.Y += target1.Pos.Y;
@@ -1133,8 +1226,26 @@ int game(InfoType &info)
                         enemyTarget = rand()%4+1;
                     }
                     if(enemyTarget==0){
-                        int y = enemys[enemy].Pos.Y-player1.Pos.Y;
-                        int x = enemys[enemy].Pos.X-player1.Pos.X;
+                        int player = 0;
+                        if(info.player1Alive){
+                            player = 1;
+                        }
+                        if(info.player2Alive){
+                            player = 2;
+                        }
+                        if(info.player1Alive && info.player2Alive){
+                            player = rand()%2+1;
+                        }
+                        int y = 0;
+                        int x = 0;
+                        if(player==1){
+                            y = enemys[enemy].Pos.Y-player1.Pos.Y;
+                            x = enemys[enemy].Pos.X-player1.Pos.X;
+                        }
+                        if(player==2){
+                            y = enemys[enemy].Pos.Y-player2.Pos.Y;
+                            x = enemys[enemy].Pos.X-player2.Pos.X;
+                        }
                         if(rand()%2==0){
                             if(y<0){
                                 enemyTarget = 2;
@@ -1406,11 +1517,11 @@ int main(){
                         if(game(info)){
                             if(info.phase>3){
                                 deadMenu = 1;
-                                cout<<"\e[13;"<<mapSizeX+3<<"H";
+                                cout<<"\e[12;"<<mapSizeX+3<<"H";
                                 cout << "┃ VITORIA!           ┃\n";
                             }
                         }else{
-                            cout<<"\e[13;"<<mapSizeX+3<<"H";
+                            cout<<"\e[12;"<<mapSizeX+3<<"H";
                             cout << "┃ DERROTA!           ┃\n";
                             deadMenu = 1;
                             info.timer = {0,0,0};
@@ -1424,22 +1535,28 @@ int main(){
                             info.player2Points = 0;
                             info.player2Alive = true;
                         }
-                        cout<<"\e[12;"<<mapSizeX+3<<"H";
+                        cout<<"\e[11;"<<mapSizeX+3<<"H";
                         new_line("┏","━","┓",20);
-                        cout<<"\e[14;"<<mapSizeX+3<<"H";
+                        cout<<"\e[13;"<<mapSizeX+3<<"H";
                         new_line("┃"," ","┃",20);
 
                         if(deadMenu==1){
                             while(true){
                                 bool kill = false;
-                                cout<<"\e[15;"<<mapSizeX+3<<"H";
+                                cout<<"\e[14;"<<mapSizeX+3<<"H";
                                 if(deadMenu==1){
                                     cout<<"┃\e[93m  [REINICIAR]       \e[0m┃\n";
                                 }else{
                                     cout<<"┃ [REINICIAR]        ┃\n";
                                 }
-                                cout<<"\e[16;"<<mapSizeX+3<<"H";
+                                cout<<"\e[15;"<<mapSizeX+3<<"H";
                                 if(deadMenu==2){
+                                    cout<<"┃\e[93m  [SALVAR]          \e[0m┃\n";
+                                }else{
+                                    cout<<"┃ [SALVAR]           ┃\n";
+                                }
+                                cout<<"\e[16;"<<mapSizeX+3<<"H";   
+                                if(deadMenu==3){
                                     cout<<"┃\e[93m  [MENU]            \e[0m┃\n";
                                 }else{
                                     cout<<"┃ [MENU]             ┃\n";
@@ -1451,18 +1568,18 @@ int main(){
                                     case 119: // Ir para cima
                                         deadMenu--;
                                         if (deadMenu < 1) {
-                                            deadMenu = 2;
+                                            deadMenu = 3;
                                         }
                                     break;
                                     case 115: // Ir para baixo
                                         deadMenu++;
-                                        if (deadMenu > 2) {
+                                        if (deadMenu > 3) {
                                             deadMenu = 1;
                                         }
                                     break;
                                     case 13:
                                         kill = true;
-                                        if(deadMenu==2){
+                                        if(deadMenu==3){
                                             success = false;
                                         }
                                         cout<<"\ec";
