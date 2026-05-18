@@ -37,7 +37,8 @@ struct EnemyType{
 
 struct BossType{
     XY Pos;
-    int HP;
+    int HP = 10;
+    bool Alive = true;
 };
 
 struct PlayerType{
