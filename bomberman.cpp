@@ -43,16 +43,17 @@ struct BossType{
 
 struct PlayerType{
     XY Pos;
-    int MaxBombs=1;
-    int MaxRange=1;
-    int Lifes=1;
-    int ActualBomb=0;
-    int Invincible=2;
-    int Item=0;
+    int MaxBombs = 1;
+    int MaxRange = 1;
+    int Lifes = 1;
+    int ActualBomb = 0;
+    int Invincible = 2;
+    int Item = 0;
     int TotalMoves = 0;
     int Totalbombs = 0;
     int Points = 0;
     bool Alive = true;
+    int Color = 255;
 };
 
 struct TimerType{
@@ -65,14 +66,8 @@ struct InfoType{
     int difficulty = 2;
     int players = 2;
     int phase = 1;
-    int player1TotalMoves = 0;
-    int player1Totalbombs = 0;
-    int player1Points = 0;
-    bool player1Alive = true;
-    int player2TotalMoves = 0;
-    int player2Totalbombs = 0;
-    int player2Points = 0;   
-    bool player2Alive = true;
+    PlayerType player1;
+    PlayerType player2;
     TimerType timer = {0,0,0};
 };
 
@@ -184,28 +179,16 @@ void render_details(InfoType info,PlayerType player1,PlayerType player2){
     }
     if(info.players==3){
         cout<<"\e[6;"<<mapSizeX+16<<"H";
-        if(info.player2Points<1000000){
+        for(int i = player2.Points; i<1000000; i*=10){
+            if(i==0){
+                i = 1;
+            }
             cout<<0;
         }
-        if(info.player2Points<100000){
-            cout<<0;
-        }
-        if(info.player2Points<10000){
-            cout<<0;
-        }
-        if(info.player2Points<1000){
-            cout<<0;
-        }
-        if(info.player2Points<100){
-            cout<<0;
-        }
-        if(info.player2Points<10){
-            cout<<0;
-        }
-        cout<<info.player2Points;
+        cout<<player2.Points;
 
         cout<<"\e[6;"<<mapSizeX+4<<"H";
-        cout<<"["<<info.player2TotalMoves<<"]["<<info.player2Totalbombs<<"]";
+        cout<<"["<<player2.TotalMoves<<"]["<<player2.Totalbombs<<"]";
 
         cout<<"\e[7;"<<mapSizeX+4<<"H";
         cout<<"[◉:";
@@ -354,14 +337,14 @@ void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[],
     }
 }
 
-void player_verifier(InfoType &info,PlayerType &player, int maximumBombs){
+void player_verifier(PlayerType &player, int maximumBombs){
         if(player.ActualBomb>=maximumBombs){
             player.ActualBomb = 0;
         }
         if(player.Points<0){
             player.Points=0;
         }
-        if(!info.player1Alive){
+        if(!player.Alive){
             player.MaxBombs=0;
             player.MaxRange=0;
             player.Lifes=0;
@@ -409,7 +392,7 @@ void bombs_explosion(BombType bombs[], int bomb, PlayerType &player, int map[map
     }
 }
 
-void player_action(PlayerType player, PositionType target, BombType bombs[],int map[mapSizeY][mapSizeX], bool putBomb){
+void player_action(PlayerType &player, PositionType &target, BombType bombs[],int map[mapSizeY][mapSizeX], bool putBomb){
     if(player.Item == 2 && player.Invincible == 0){
         if(map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock && map[player.Pos.Y][player.Pos.X] != fragileBlock){
             player.Pos.Y -= target.Pos.Y;
@@ -459,16 +442,17 @@ int game(InfoType &info){
     PositionType portal;
 
     PlayerType player1;
-    player1.Alive = info.player1Alive;
-    player1.Points = info.player1Points;
-    player1.Totalbombs = info.player1Totalbombs;
-    player1.TotalMoves = info.player1TotalMoves;
+    player1.Alive = info.player1.Alive;
+    player1.Points = info.player1.Points;
+    player1.Totalbombs = info.player1.Totalbombs;
+    player1.TotalMoves = info.player1.TotalMoves;
+    player1.Color = info.player1.Color;
     PlayerType player2;
-    player2.Alive = info.player2Alive;
-    player2.Points = info.player2Points;
-    player2.Totalbombs = info.player2Totalbombs;
-    player2.TotalMoves = info.player2TotalMoves;
-    int cpuMoves = clock();
+    player2.Alive = info.player2.Alive;
+    player2.Points = info.player2.Points;
+    player2.Totalbombs = info.player2.Totalbombs;
+    player2.TotalMoves = info.player2.TotalMoves;
+    player2.Color = info.player2.Color;
 
     int maximumBombs = 25;
     BombType bombs1[maximumBombs];
@@ -535,7 +519,7 @@ int game(InfoType &info){
             }
         }
     }
-    if(info.player1Alive){
+    if(player1.Alive){
         while(true){ // Gera a posição do jogador
             bool success = false;
             player1.Pos.Y = rand()%mapSizeY;
@@ -561,7 +545,7 @@ int game(InfoType &info){
         player1.Pos.X = -2;
         player1.Alive = false;
     }
-    if(info.players==3 && info.player2Alive){
+    if(info.players==3 && player2.Alive){
         while(true){ // Gera a posição do jogador2
             bool success = false;
             player2.Pos.Y = rand()%mapSizeY;
@@ -673,18 +657,18 @@ int game(InfoType &info){
 
 //---------------------------> RENDERIZAÇÃO DO MAPA >---------------------------//
     while(true){
-        player_verifier(info,player1,maximumBombs);
-        player_verifier(info,player2,maximumBombs);
+        player_verifier(player1,maximumBombs);
+        player_verifier(player2,maximumBombs);
 
-        info.player1Alive = player1.Alive;
-        info.player1Points = player1.Points;
-        info.player1Totalbombs = player1.Totalbombs;
-        info.player1TotalMoves = player1.TotalMoves;
+        info.player1.Alive = player1.Alive;
+        info.player1.Points = player1.Points;
+        info.player1.Totalbombs = player1.Totalbombs;
+        info.player1.TotalMoves = player1.TotalMoves;
 
-        info.player2Alive = player2.Alive;
-        info.player2Points = player2.Points;
-        info.player2Totalbombs = player2.Totalbombs;
-        info.player2TotalMoves = player2.TotalMoves;
+        info.player2.Alive = player2.Alive;
+        info.player2.Points = player2.Points;
+        info.player2.Totalbombs = player2.Totalbombs;
+        info.player2.TotalMoves = player2.TotalMoves;
 
         if((!player1.Alive) && (!player2.Alive)){
             return 0;
@@ -732,16 +716,16 @@ int game(InfoType &info){
                         }else{
                             if(player1.Invincible==0){
                                 if(map[player1.Pos.Y][player1.Pos.X] == fragileBlock){
-                                        cout << "\e[97;42m\e[48;5;245m\u25CF"; // PLAYER
+                                        cout << "\e[48;5;245m\e[38;5;"<<player1.Color<<"m\u25CF"; // PLAYER
                                         player1.Item = 0;
                                 }else{
-                                    cout << "\e[97;42m\u25CF"; // PLAYER
+                                    cout << "\e[0;42m\e[38;5;"<<player1.Color<<"m\u25CF"; // PLAYER
                                 }
                             }else{
                                 if(rand()%2){
-                                    cout << "\e[0;42m\e[38;5;21m\u25CF";
+                                    cout << "\e[0;42m\e[38;5;"<<player1.Color<<"m\u25CF"; // PLAYER
                                 }else{
-                                    cout << "\e[0;42m\e[38;5;51m\u25CF";
+                                    cout << "\e[32;42m ";
                                 }
                             }
                         }
@@ -755,16 +739,16 @@ int game(InfoType &info){
                         }else{
                             if(player2.Invincible==0){
                                 if(map[player2.Pos.Y][player2.Pos.X] == fragileBlock){
-                                        cout << "\e[48;5;245m\e[38;5;81m\u25CF"; // PLAYER
+                                        cout << "\e[48;5;245m\e[38;5;"<<player2.Color<<"m\u25CF"; // PLAYER
                                         player2.Item = 0;
                                 }else{
-                                    cout << "\e[0;42m\e[38;5;81m\u25CF"; // PLAYER
+                                    cout << "\e[0;42m\e[38;5;"<<player2.Color<<"m\u25CF"; // PLAYER
                                 }
                             }else{
                                 if(rand()%2){
-                                    cout << "\e[0;42m\e[38;5;21m\u25CF";
+                                    cout << "\e[0;42m\e[38;5;"<<player2.Color<<"m\u25CF"; // PLAYER
                                 }else{
-                                    cout << "\e[0;42m\e[38;5;51m\u25CF";
+                                    cout << "\e[32;42m ";
                                 }
                             }
                         }
@@ -858,118 +842,114 @@ int game(InfoType &info){
             if(info.players==1){
                 key = 0;
                 int danger[4] = {-1,-1,-1,-1};
-                if((clock()-cpuMoves) >= 0){
-                    cpuMoves = clock();
-                    int totalEnemys = 0;
-                    bool putBomb = false;
-                    for(int y=-1;y<=1;y++){
-                        for(int x=-1;x<=1;x++){
-                            if((y==0||x==0)){
-                                if(player1.Item==2 && player1.Invincible==0){
-                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock && map[player1.Pos.Y+y][player1.Pos.X+x]!=fragileBlock){
-                                        found_danger(danger,y,x);
-                                    }
-                                }else{
-                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                        found_danger(danger,y,x);
-                                    }
+                int totalEnemys = 0;
+                bool putBomb = false;
+                for(int y=-1;y<=1;y++){
+                    for(int x=-1;x<=1;x++){
+                        if((y==0||x==0)){
+                            if(player1.Item==2 && player1.Invincible==0){
+                                if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock && map[player1.Pos.Y+y][player1.Pos.X+x]!=fragileBlock){
+                                    found_danger(danger,y,x);
                                 }
-
+                            }else{
+                                if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                    found_danger(danger,y,x);
+                                }
+                            }
+                            for(int enemy=0;enemy<enemysQuantity;enemy++){
+                                if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
+                                    found_danger(danger,y,x);
+                                    putBomb = true;
+                                }
+                                int Y = 0;
+                                int X = 0;
+                                if(enemys[enemy].Move == 1){
+                                    Y--;
+                                }
+                                if(enemys[enemy].Move == 2){
+                                    Y++;
+                                }
+                                if(enemys[enemy].Move == 3){
+                                    X--;
+                                }
+                                if(enemys[enemy].Move == 4) {
+                                    X++;
+                                }
+                                if(((player1.Pos.Y+y == enemys[enemy].Pos.Y+Y && player1.Pos.X+x == enemys[enemy].Pos.X+X) && freezeEnemys==0)){
+                                    putBomb = true;
+                                    found_danger(danger,y,x);
+                                }
+                            }
+                        }
+                    }
+                }
+                for(int y=-2;y<=2;y++){
+                    for(int x=-2;x<=2;x++){
+                        if((player1.Pos.Y+y>0 && player1.Pos.Y+y<mapSizeY && player1.Pos.X+x>0 && player1.Pos.X+x<mapSizeX)){
+                            if(((y>=-1||x>=-1) && (y<=1||x<=1)) || (y==0||x==0)){
                                 for(int enemy=0;enemy<enemysQuantity;enemy++){
                                     if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
-                                        found_danger(danger,y,x);
-                                        putBomb = true;
+                                        totalEnemys++;
                                     }
-                                    int Y = 0;
-                                    int X = 0;
-                                    if(enemys[enemy].Move == 1){
-                                        Y--;
-                                    }
-                                    if(enemys[enemy].Move == 2){
-                                        Y++;
-                                    }
-                                    if(enemys[enemy].Move == 3){
-                                        X--;
-                                    }
-                                    if(enemys[enemy].Move == 4) {
-                                        X++;
-                                    }
-                                    if(((player1.Pos.Y+y == enemys[enemy].Pos.Y+Y && player1.Pos.X+x == enemys[enemy].Pos.X+X) && freezeEnemys==0)){
-                                        putBomb = true;
-                                        found_danger(danger,y,x);
+                                }
+                                if(map[player1.Pos.Y+y][player1.Pos.X+x]==bombBlock){
+                                    for(int bomb=0;bomb<maximumBombs;bomb++){
+                                        if((bombs1[bomb].Pos.Y==player1.Pos.Y+y && bombs1[bomb].Pos.X==player1.Pos.X+x) && (clock()-bombs1[bomb].Time)>=850){
+                                            found_danger(danger,y,x);
+                                        }
                                     }
                                 }
                             }
-                        }
-                    }
-                    for(int y=-2;y<=2;y++){
-                        for(int x=-2;x<=2;x++){
-                            if((player1.Pos.Y+y>0 && player1.Pos.Y+y<mapSizeY && player1.Pos.X+x>0 && player1.Pos.X+x<mapSizeX)){
-                                if(((y>=-1||x>=-1) && (y<=1||x<=1)) || (y==0||x==0)){
-                                    for(int enemy=0;enemy<enemysQuantity;enemy++){
-                                        if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
-                                            totalEnemys++;
-                                        }
-                                    }
-                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]==bombBlock){
-                                        for(int bomb=0;bomb<maximumBombs;bomb++){
-                                            if((bombs1[bomb].Pos.Y==player1.Pos.Y+y && bombs1[bomb].Pos.X==player1.Pos.X+x) && (clock()-bombs1[bomb].Time)>=850){
-                                                found_danger(danger,y,x);
+                            if(((y>=-1&&x>=-1) && (y<=1&&x<=1)) || (y==0||x==0)){
+                                if(totalEnemys>0 || map[player1.Pos.Y][player1.Pos.X]==bombBlock){
+                                    if(y==-2 && x==0){
+                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                            int y1 = y+1;
+                                            int x1 = x-1;
+                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                                int y2 = y1;
+                                                int x2 = x1+2;
+                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                    found_danger(danger,y,x);
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                if(((y>=-1&&x>=-1) && (y<=1&&x<=1)) || (y==0||x==0)){
-                                    if(totalEnemys>0 || map[player1.Pos.Y][player1.Pos.X]==bombBlock){
-                                        if(y==-2 && x==0){
-                                            if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                                int y1 = y+1;
-                                                int x1 = x-1;
-                                                if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                    int y2 = y1;
-                                                    int x2 = x1+2;
-                                                    if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                        found_danger(danger,y,x);
-                                                    }
+                                    if(y==0 && x==2){
+                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                            int y1 = y-1;
+                                            int x1 = x-1;
+                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                                int y2 = y1+2;
+                                                int x2 = x1;
+                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                    found_danger(danger,y,x);
                                                 }
                                             }
                                         }
-                                        if(y==0 && x==2){
-                                            if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                                int y1 = y-1;
-                                                int x1 = x-1;
-                                                if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                    int y2 = y1+2;
-                                                    int x2 = x1;
-                                                    if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                        found_danger(danger,y,x);
-                                                    }
+                                    }
+                                    if(y==2 && x==0){
+                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                            int y1 = y-1;
+                                            int x1 = x+1;
+                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                                int y2 = y1;
+                                                int x2 = x1-2;
+                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                    found_danger(danger,y,x);
                                                 }
                                             }
                                         }
-                                        if(y==2 && x==0){
-                                            if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                                int y1 = y-1;
-                                                int x1 = x+1;
-                                                if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                    int y2 = y1;
-                                                    int x2 = x1-2;
-                                                    if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                        found_danger(danger,y,x);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if(y==0 && x==-2){
-                                            if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                                int y1 = y+1;
-                                                int x1 = x+1;
-                                                if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                    int y2 = y1-2;
-                                                    int x2 = x1;
-                                                    if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                        found_danger(danger,y,x);
-                                                    }
+                                    }
+                                    if(y==0 && x==-2){
+                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                            int y1 = y+1;
+                                            int x1 = x+1;
+                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                                int y2 = y1-2;
+                                                int x2 = x1;
+                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                    found_danger(danger,y,x);
                                                 }
                                             }
                                         }
@@ -978,61 +958,61 @@ int game(InfoType &info){
                             }
                         }
                     }
-                    int safes = 0;
-                    for(int i=0;i<4;i++){
-                        safes += (danger[i]==-1) ? 1 : 0;
-                    }
-                    if(rand()%2==0 && !theres_bomb(bombs1,maximumBombs) && totalEnemys>=1){
-                        int enemyChoiced = -1;
-                        for(int enemy=0;enemy<enemysQuantity;enemy++){
-                            if(enemys[enemy].Pos.X==-1 && enemys[enemy].Pos.Y==-1){
-                                continue;
-                            }
-                            if(enemys[enemy].Pos.X!=-1 && enemys[enemy].Pos.Y!=-1){
-                                if(enemyChoiced==-1){
+                }
+                int safes = 0;
+                for(int i=0;i<4;i++){
+                    safes += (danger[i]==-1) ? 1 : 0;
+                }
+                if(rand()%2==0 && !theres_bomb(bombs1,maximumBombs) && totalEnemys>=1){
+                    int enemyChoiced = -1;
+                    for(int enemy=0;enemy<enemysQuantity;enemy++){
+                        if(enemys[enemy].Pos.X==-1 && enemys[enemy].Pos.Y==-1){
+                            continue;
+                        }
+                        if(enemys[enemy].Pos.X!=-1 && enemys[enemy].Pos.Y!=-1){
+                            if(enemyChoiced==-1){
+                                enemyChoiced = enemy;
+                            }else{
+                                if((VA(player1.Pos.Y-enemys[enemy].Pos.Y) < VA(player1.Pos.Y-enemys[enemyChoiced].Pos.Y)) && (VA(player1.Pos.X-enemys[enemy].Pos.X) < VA(player1.Pos.X-enemys[enemyChoiced].Pos.X))){
                                     enemyChoiced = enemy;
-                                }else{
-                                    if((VA(player1.Pos.Y-enemys[enemy].Pos.Y) < VA(player1.Pos.Y-enemys[enemyChoiced].Pos.Y)) && (VA(player1.Pos.X-enemys[enemy].Pos.X) < VA(player1.Pos.X-enemys[enemyChoiced].Pos.X))){
-                                        enemyChoiced = enemy;
-                                    }
                                 }
                             }
                         }
-                        int y = player1.Pos.Y-enemys[enemyChoiced].Pos.Y;
-                        int x = player1.Pos.X-enemys[enemyChoiced].Pos.X;
-                        found_danger(danger,y,x);
                     }
-                    for(int tryIt=0;tryIt<11;tryIt++){
-                        if(tryIt==10){
-                            key = 0;
-                            break;
-                        }
-                        bool success = true;
-                        key = rand()%4;
-                        key = (key==0) ? 119 : (key==1) ? 115 : (key==2) ? 97 : (key==3) ? 100 : 0;
-                        for(int i=0;i<4;i++){
-                            if(key==danger[i]){
-                                success = false;
-                            }
-                        }
-                        if(success){
-                            break;
+                    int y = player1.Pos.Y-enemys[enemyChoiced].Pos.Y;
+                    int x = player1.Pos.X-enemys[enemyChoiced].Pos.X;
+                    found_danger(danger,y,x);
+                }
+                for(int tryIt=0;tryIt<11;tryIt++){
+                    if(tryIt==10){
+                        key = 0;
+                        break;
+                    }
+                    bool success = true;
+                    key = rand()%4;
+                    key = (key==0) ? 119 : (key==1) ? 115 : (key==2) ? 97 : (key==3) ? 100 : 0;
+                    for(int i=0;i<4;i++){
+                        if(key==danger[i]){
+                            success = false;
                         }
                     }
-                    for(int y=-1;y<=1;y++){
-                        for(int x=-1;x<=1;x++){
-                            if((y==0||x==0) && (map[player1.Pos.Y+y][player1.Pos.X+x]==fragileBlock) && (rand()%4==0) && totalEnemys==0 && (((y>=-1||x>=-1) && (y<=1||x<=1)) && map[player1.Pos.Y+y][player1.Pos.X+x]!=bombBlock)){
-                                key = 32;
-                            }
-                            if((y==0||x==0) && putBomb && (rand()%4==0) && safes>=1 && map[player1.Pos.Y+y][player1.Pos.X+x]!=bombBlock){
-                                key = 32;
-                            }
+                    if(success){
+                        break;
+                    }
+                }
+                for(int y=-1;y<=1;y++){
+                    for(int x=-1;x<=1;x++){
+                        if((y==0||x==0) && (map[player1.Pos.Y+y][player1.Pos.X+x]==fragileBlock) && (rand()%4==0) && totalEnemys==0 && (((y>=-1||x>=-1) && (y<=1||x<=1)) && map[player1.Pos.Y+y][player1.Pos.X+x]!=bombBlock)){
+                            key = 32;
+                        }
+                        if((y==0||x==0) && putBomb && (rand()%4==0) && safes>=1 && map[player1.Pos.Y+y][player1.Pos.X+x]!=bombBlock){
+                            key = 32;
                         }
                     }
                 }
             }
 //----------------------< CPU PLAYER <----------------------//
-            if(info.player1Alive){
+            if(player1.Alive){
                 switch(key){
                     case 119: // Cima
                         target1.Pos.Y--;
@@ -1049,7 +1029,7 @@ int game(InfoType &info){
                 }
             }
             if(info.players==3){
-                if(info.player2Alive){
+                if(player2.Alive){
                     switch(key){
                         case 72: // Cima
                             target2.Pos.Y--;
@@ -1071,7 +1051,7 @@ int game(InfoType &info){
             player2.Pos.Y += target2.Pos.Y;
             player2.Pos.X += target2.Pos.X;
             if(key==119 || key==115 || key==97 || key==100 || key==32){
-                if(info.player1Alive){
+                if(player1.Alive){
                     int putBomb = false;
                     if(key==32 && (map[player1.Pos.Y][player1.Pos.X] == freeBlock) && player1.Invincible == 0 && (bombs1[player1.ActualBomb].Pos.Y == -1 && bombs1[player1.ActualBomb].Pos.X == -1)){
                         if(count_bombs(bombs1, maximumBombs) < player1.MaxBombs){
@@ -1082,7 +1062,7 @@ int game(InfoType &info){
                 }
             }
             if(key==72 || key==80 || key==75 || key==77 || key==48){
-                if(info.player2Alive){
+                if(player2.Alive){
                     int putBomb = false;
                     if(key==48 && (map[player2.Pos.Y][player2.Pos.X] == freeBlock) && player2.Invincible == 0 && (bombs2[player2.ActualBomb].Pos.Y == -1 && bombs2[player2.ActualBomb].Pos.X == -1)){
                         if(count_bombs(bombs2, maximumBombs) < player2.MaxBombs){
@@ -1202,13 +1182,13 @@ int game(InfoType &info){
                     }
                     if(enemyTarget==0){
                         int player = 0;
-                        if(info.player1Alive){
+                        if(player1.Alive){
                             player = 1;
                         }
-                        if(info.player2Alive){
+                        if(player2.Alive){
                             player = 2;
                         }
-                        if(info.player1Alive && info.player2Alive){
+                        if(player1.Alive && player2.Alive){
                             player = rand()%2+1;
                         }
                         int y = 0;
@@ -1372,6 +1352,8 @@ int main(){
                     bool success = false;
                     int gameMenu = 1;
                     InfoType info;
+                    info.player1.Color = rand()%256;
+                    info.player2.Color = rand()%256;
                     while(true){
                         bool kill = false;
                         cout << "\e[?25l\e[1;18H";
@@ -1501,14 +1483,14 @@ int main(){
                             deadMenu = 1;
                             info.timer = {0,0,0};
                             info.phase = 1;
-                            info.player1TotalMoves = 0;
-                            info.player1Totalbombs = 0;
-                            info.player1Points = 0;
-                            info.player1Alive = true;
-                            info.player2TotalMoves = 0;
-                            info.player2Totalbombs = 0;
-                            info.player2Points = 0;
-                            info.player2Alive = true;
+                            info.player1.TotalMoves = 0;
+                            info.player1.Totalbombs = 0;
+                            info.player1.Points = 0;
+                            info.player1.Alive = true;
+                            info.player2.TotalMoves = 0;
+                            info.player2.Totalbombs = 0;
+                            info.player2.Points = 0;
+                            info.player2.Alive = true;
                         }
                         cout<<"\e[11;"<<mapSizeX+3<<"H";
                         new_line("┏","━","┓",20);
