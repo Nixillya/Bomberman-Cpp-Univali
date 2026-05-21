@@ -46,12 +46,11 @@ Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho d
     ✅ - Parâmetro Default e Sobrecarga.
     ✅ - Recursividade.
     ✅ - Struct
+    ✅ - No último nível deve ter um boss
+    ✅ - Template
 
     ❌ - Ter opção explicando a pontuação
     ❌ - Ter opção mostrando o Rank Ordenado
     ❌ - O Jogo ser salvado em um arquivo
-    ❌ - No último nível deve ter 1 inimigo especial que execute movimentos mais inteligentes
-    ❌ - Deve ter um boss
-    ❌ - Colocar música no jogo 
+    ❌ - Colocar música no jogo
     ❌ - Criar arquivo, manipular: ler, inserir e dados
-    ❌ - Template

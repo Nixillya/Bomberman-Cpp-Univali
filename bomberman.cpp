@@ -37,8 +37,10 @@ struct EnemyType{
 
 struct BossType{
     XY Pos;
+    XY Target;
+    int Move;
     int HP = 10;
-    bool Alive = true;
+    bool Alive = false;
     int Clock = clock();
 };
 
@@ -48,7 +50,7 @@ struct PlayerType{
     int MaxRange = 1;
     int Lifes = 1;
     int ActualBomb = 0;
-    int Invincible = 2;
+    int Invincible = 4;
     int Item = 0;
     int TotalMoves = 0;
     int Totalbombs = 0;
@@ -429,7 +431,6 @@ void player_action(PlayerType &player, PositionType &target, BombType bombs[],in
 
 int game(InfoType &info){
     //------------------------> VARIAVEIS GERAIS >------------------------//
-
     int enemysQuantity;
     if(info.difficulty==1){
         enemysQuantity = 3*info.phase;
@@ -444,6 +445,9 @@ int game(InfoType &info){
     int freezeEnemys = 0;
     EnemyType enemys[enemysQuantity];
     BossType boss;
+    if(info.phase == 3){
+        boss.Alive = true;
+    }
 
     int fragileWallQuantity = 50;
     PositionType boxs[fragileWallQuantity];
@@ -671,6 +675,7 @@ int game(InfoType &info){
                  if(block){
                     if(y==boss.Pos.Y && x==boss.Pos.X){
                         cout << "\e[31;42m\u25A0";
+                        block = false;
                     }
                  }
                  if(block){
@@ -683,7 +688,6 @@ int game(InfoType &info){
                                 }else{
                                     cout << "\e[31;43m\e[38;5;52m\u25A1"; // INIMIGO MORTO NA EXPLOSÃO CONGELADO
                                 }
-
                             }else{
                                 if((player1.Pos.Y==enemys[enemy].Pos.Y && player1.Pos.X==enemys[enemy].Pos.X) || (player2.Pos.Y==enemys[enemy].Pos.Y && player2.Pos.X==enemys[enemy].Pos.X)) {
                                     cout << "\e[31;42m\u25CB"; // PLAYER MORTO NO INIMIGO
@@ -1250,6 +1254,52 @@ int game(InfoType &info){
                 }
             }
         }
+        if(boss.Alive == true){
+            if((clock()-boss.Clock) >= 250){
+                boss.Target.Y = 0;
+                boss.Target.X = 0;
+                if(boss.Move==1){
+                    boss.Target.Y++;
+                }
+                if(boss.Move==2){
+                    boss.Target.Y--;
+                }
+                if(boss.Move==3){
+                    boss.Target.X++;
+                }
+                if(boss.Move==4){
+                    boss.Target.X--;
+                }
+                boss.Pos.Y+=boss.Target.Y;
+                boss.Pos.X+=boss.Target.X;
+                if((boss.Pos.Y <= 0 || boss.Pos.Y >= mapSizeY-1) || (boss.Pos.X <= 0 || boss.Pos.X >= mapSizeX-1)){
+                    boss.Pos.Y-=boss.Target.Y;
+                    boss.Pos.X-=boss.Target.X;
+                }
+                map[boss.Pos.Y][boss.Pos.X] = freeBlock;
+                if(rand()%2==0){
+                    boss.Move = rand()%4+1;
+                }
+                if(rand()%3==0){
+                    boss.Move = 0;
+                }
+                if(rand()%2==0){
+                    int BlockY = rand()%mapSizeY;
+                    int BlockX = rand()%mapSizeX;
+                    for(int y=-1;y<=1;y++){
+                        for(int x=-1;x<=1;x++){
+                            if((y==0 || x==0)){
+                                if(map[BlockY][BlockX]!=solidBlock){
+                                    if(map[BlockY+y][BlockX+x] == solidBlock || map[BlockY+y][BlockX+x] == fragileBlock){
+                                        map[BlockY][BlockX] = fragileBlock;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 //----------------------------< SISTEMA DOS INIMIGOS <----------------------------//
 
 //-----------------------------------> SISTEMA DAS BOMBAS >-----------------------------------//
@@ -1345,6 +1395,7 @@ int main(){
                     bool success = false;
                     int gameMenu = 1;
                     InfoType info;
+                    info.phase = 3;
                     while(true){
                         bool kill = false;
                         cout << "\e[?25l\e[1;18H";
