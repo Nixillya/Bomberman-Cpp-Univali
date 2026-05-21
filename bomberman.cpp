@@ -39,6 +39,7 @@ struct BossType{
     XY Pos;
     int HP = 10;
     bool Alive = true;
+    int Clock = clock();
 };
 
 struct PlayerType{
@@ -53,7 +54,6 @@ struct PlayerType{
     int Totalbombs = 0;
     int Points = 0;
     bool Alive = true;
-    int Color = 255;
 };
 
 struct TimerType{
@@ -79,6 +79,17 @@ int VA(int number){
         number*=-1;
     }
     return number;
+}
+
+template<typename number> 
+int swaper(number x){
+    static int i = 0;
+    if(i==1){
+        i = 0;
+    }else{
+        i++;
+    }
+    return i;
 }
 
 bool explode(int map[mapSizeY][mapSizeX], BombType bomb, int y, int x,int i=0){
@@ -193,19 +204,19 @@ void render_details(InfoType info,PlayerType player1,PlayerType player2){
         cout<<"\e[7;"<<mapSizeX+4<<"H";
         cout<<"[◉:";
         if(player2.MaxBombs<10){
-            cout<<"0"<<player2.MaxBombs;
+            cout<<0<<player2.MaxBombs;
         }else{
             cout<<player2.MaxBombs;
         }
         cout<<" ◈:";
         if(player2.MaxRange<10){
-            cout<<"0"<<player2.MaxRange;
+            cout<<0<<player2.MaxRange;
         }else{
             cout<<player2.MaxRange;
         }
         cout<<" ☤:";
         if(player2.Lifes<10){
-            cout<<"0"<<player2.Lifes;
+            cout<<0<<player2.Lifes;
         }else{
             cout<<player2.Lifes;
         }
@@ -261,7 +272,25 @@ int count_bombs(BombType bombs[], int maximumBombs){
     return totalbombs;
 }
 
-void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[]){
+void lost_life(PlayerType &player, int &moveEnemy, int &timerClock){
+    player.Lifes--;
+    if (player.Lifes >= 1){
+        player.Points -= 200;
+        player.MaxBombs = 1;
+        player.MaxRange = 1;
+        moveEnemy = clock();
+        timerClock = clock();
+        player.Item = 0;
+        player.Invincible = 1;
+    }
+    else{
+        player.Pos.Y = -2;
+        player.Pos.X = -2;
+        player.Alive = false;
+    }
+}
+
+void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType boss){
     for (int enemy = 0; enemy < enemysQuantity; enemy++){
         if (player.Item == 1){
             for (int y = -1; y <= 1; y++){
@@ -276,35 +305,14 @@ void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[],
         }
     }
     if (map[player.Pos.Y][player.Pos.X] == explosionBlock && player.Invincible == 0){
-        player.Lifes--;
-        if (player.Lifes >= 1){
-            player.Points -= 200;
-            moveEnemy = clock();
-            timerClock = clock();
-            player.Item = 0;
-            player.Invincible = 1;
-        }
-        else{
-            player.Pos.Y = -2;
-            player.Pos.X = -2;
-            player.Alive = false;
-        }
+        lost_life(player, moveEnemy, timerClock);
+    }
+    if(player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X){
+        lost_life(player, moveEnemy, timerClock);
     }
     for (int enemy = 0; enemy < enemysQuantity; enemy++){
         if ((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) && player.Invincible == 0){
-            player.Lifes--;
-            if (player.Lifes >= 1){
-                player.Points -= 200;
-                moveEnemy = clock();
-                timerClock = clock();
-                player.Item = 0;
-                player.Invincible = 1;
-                continue;
-            }else{
-                player.Pos.Y = -2;
-                player.Pos.X = -2;
-                player.Alive = false;
-            }
+            lost_life(player, moveEnemy, timerClock);
         }
     }
     for (int box = 0; box < fragileWallQuantity; box++){
@@ -446,13 +454,11 @@ int game(InfoType &info){
     player1.Points = info.player1.Points;
     player1.Totalbombs = info.player1.Totalbombs;
     player1.TotalMoves = info.player1.TotalMoves;
-    player1.Color = info.player1.Color;
     PlayerType player2;
     player2.Alive = info.player2.Alive;
     player2.Points = info.player2.Points;
     player2.Totalbombs = info.player2.Totalbombs;
     player2.TotalMoves = info.player2.TotalMoves;
-    player2.Color = info.player2.Color;
 
     int maximumBombs = 25;
     BombType bombs1[maximumBombs];
@@ -546,26 +552,8 @@ int game(InfoType &info){
         player1.Alive = false;
     }
     if(info.players==3 && player2.Alive){
-        while(true){ // Gera a posição do jogador2
-            bool success = false;
-            player2.Pos.Y = rand()%mapSizeY;
-            player2.Pos.X = rand()%mapSizeX;
-            if (map[player2.Pos.Y][player2.Pos.X] == freeBlock){ // Verifica se a posição do player1 é uma area livre, se for, ele faz uma verificação para não gerar o player1 perto de paredes frageis
-                success = true;
-                for (int y = -1; y < 2; y++){
-                    for (int x = -1; x < 2; x++){ // Passa por uma matriz 3x3 em volta do player1
-                        if(y==0 || x==0){ // Verifica se tem uma parede fragil em volta do player1, se tiver, ele gera outra posição
-                            if (map[player2.Pos.Y+y][player2.Pos.X+x] == fragileBlock){
-                                success = false;
-                            }
-                        }
-                    }
-                }
-                if(success){
-                    break;
-                }
-            }
-        }
+        player2.Pos.Y = player1.Pos.Y;
+        player2.Pos.X = player1.Pos.X;
     }else{
         player2.Pos.Y = -2;
         player2.Pos.X = -2;
@@ -681,6 +669,11 @@ int game(InfoType &info){
             for (int x = 0; x < mapSizeX; x++) {
                  bool block = true;
                  if(block){
+                    if(y==boss.Pos.Y && x==boss.Pos.X){
+                        cout << "\e[31;42m\u25A0";
+                    }
+                 }
+                 if(block){
                     for(int enemy=0; enemy<enemysQuantity; enemy++) {
                         if(y==enemys[enemy].Pos.Y && x==enemys[enemy].Pos.X) {
                             block = false;
@@ -712,18 +705,18 @@ int game(InfoType &info){
                     if (player1.Pos.Y == y && player1.Pos.X == x) {
                         block = false;
                         if(map[player1.Pos.Y][player1.Pos.X] == explosionBlock){
-                            cout << "\e[97;43m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
+                            cout << "\e[97;43m\e[38;5;255m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
                         }else{
                             if(player1.Invincible==0){
                                 if(map[player1.Pos.Y][player1.Pos.X] == fragileBlock){
-                                        cout << "\e[48;5;245m\e[38;5;"<<player1.Color<<"m\u25CF"; // PLAYER
+                                        cout << "\e[48;5;245m\e[38;5;255m\u25CF"; // PLAYER
                                         player1.Item = 0;
                                 }else{
-                                    cout << "\e[0;42m\e[38;5;"<<player1.Color<<"m\u25CF"; // PLAYER
+                                    cout << "\e[0;42m\e[38;5;255m\u25CF"; // PLAYER
                                 }
                             }else{
-                                if(rand()%2){
-                                    cout << "\e[0;42m\e[38;5;"<<player1.Color<<"m\u25CF"; // PLAYER
+                                if(swaper<int>(1)==1){
+                                    cout << "\e[0;42m\e[38;5;255m\u25CF"; // PLAYER
                                 }else{
                                     cout << "\e[32;42m ";
                                 }
@@ -735,18 +728,18 @@ int game(InfoType &info){
                     if (player2.Pos.Y == y && player2.Pos.X == x) {
                         block = false;
                         if(map[player2.Pos.Y][player2.Pos.X] == explosionBlock){
-                            cout << "\e[97;43m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
+                            cout << "\e[97;43m\e[38;5;0m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
                         }else{
                             if(player2.Invincible==0){
                                 if(map[player2.Pos.Y][player2.Pos.X] == fragileBlock){
-                                        cout << "\e[48;5;245m\e[38;5;"<<player2.Color<<"m\u25CF"; // PLAYER
+                                        cout << "\e[48;5;245m\e[38;5;0m\u25CF"; // PLAYER
                                         player2.Item = 0;
                                 }else{
-                                    cout << "\e[0;42m\e[38;5;"<<player2.Color<<"m\u25CF"; // PLAYER
+                                    cout << "\e[0;42m\e[38;5;0m\u25CF"; // PLAYER
                                 }
                             }else{
-                                if(rand()%2){
-                                    cout << "\e[0;42m\e[38;5;"<<player2.Color<<"m\u25CF"; // PLAYER
+                                if(swaper<double>(2)==1){
+                                    cout << "\e[0;42m\e[38;5;0m\u25CF"; // PLAYER
                                 }else{
                                     cout << "\e[32;42m ";
                                 }
@@ -820,8 +813,8 @@ int game(InfoType &info){
             info.phase++;
             return 1;
         }
-        player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs);
-        player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs);
+        player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+        player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
 
         if (kbhit() || info.players==1){
             PositionType target1;
@@ -1080,9 +1073,9 @@ int game(InfoType &info){
             int actualEnemys = 0;
             moveEnemy = clock();
             for(int enemy = 0; enemy<enemysQuantity; enemy++){
-                if(enemys[enemy].Pos.Y == -1 && enemys[enemy].Pos.X == -1){
-                    if (enemy == enemysQuantity-1) {
-                        if (actualEnemys == 0){
+                if((enemys[enemy].Pos.Y == -1 && enemys[enemy].Pos.X == -1) && (boss.Pos.Y == -1 && boss.Pos.X == -1)){
+                    if(enemy == enemysQuantity-1){
+                        if(actualEnemys == 0){
                             if(portal.Pos.Y == -1 && portal.Pos.X == -1){
                                 while(true){ // Gera a posição do Portal
                                     bool success = false;
@@ -1352,8 +1345,6 @@ int main(){
                     bool success = false;
                     int gameMenu = 1;
                     InfoType info;
-                    info.player1.Color = rand()%256;
-                    info.player2.Color = rand()%256;
                     while(true){
                         bool kill = false;
                         cout << "\e[?25l\e[1;18H";
@@ -1473,9 +1464,19 @@ int main(){
                         int deadMenu = -1;
                         if(game(info)){
                             if(info.phase>3){
-                                deadMenu = 1;
                                 cout<<"\e[12;"<<mapSizeX+3<<"H";
                                 cout << "┃ VITORIA!           ┃\n";
+                                deadMenu = 1;
+                                info.timer = {0,0,0};
+                                info.phase = 1;
+                                info.player1.TotalMoves = 0;
+                                info.player1.Totalbombs = 0;
+                                info.player1.Points = 0;
+                                info.player1.Alive = true;
+                                info.player2.TotalMoves = 0;
+                                info.player2.Totalbombs = 0;
+                                info.player2.Points = 0;
+                                info.player2.Alive = true;
                             }
                         }else{
                             cout<<"\e[12;"<<mapSizeX+3<<"H";
