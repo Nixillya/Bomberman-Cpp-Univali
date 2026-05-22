@@ -976,6 +976,13 @@ int game(InfoType &info){
                                     found_danger(danger,y,x);
                                 }
                             }
+                            for(int bomb=0;bomb<maximumBombs;bomb++){
+                                if((player1.Pos.Y+y == bombs1[bomb].Pos.Y || player1.Pos.X+x == bombs1[bomb].Pos.X) && (clock() - bombs1[bomb].Time > 500)){
+                                    if(map[player1.Pos.Y][player1.Pos.X]!=bombBlock){
+                                        found_danger(danger,y,x);
+                                    }
+                                }
+                            }
                             for(int enemy=0;enemy<enemysQuantity;enemy++){
                                 if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
                                     found_danger(danger,y,x);
@@ -1020,7 +1027,6 @@ int game(InfoType &info){
                             }
                             if(((player1.Pos.Y+y == boss.Pos.Y+Y && player1.Pos.X+x == boss.Pos.X+X))){
                                 found_danger(danger,y,x);
-                                putBomb = false;
                             }
                         }
                     }
@@ -1032,13 +1038,6 @@ int game(InfoType &info){
                                 for(int enemy=0;enemy<enemysQuantity;enemy++){
                                     if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
                                         totalEnemys++;
-                                    }
-                                }
-                                if(map[player1.Pos.Y+y][player1.Pos.X+x]==bombBlock){
-                                    for(int bomb=0;bomb<maximumBombs;bomb++){
-                                        if((bombs1[bomb].Pos.Y==player1.Pos.Y+y && bombs1[bomb].Pos.X==player1.Pos.X+x) && (clock()-bombs1[bomb].Time)>=850){
-                                            found_danger(danger,y,x);
-                                        }
                                     }
                                 }
                             }
@@ -1105,7 +1104,7 @@ int game(InfoType &info){
                 for(int i=0;i<4;i++){
                     safes += (danger[i]==-1) ? 1 : 0;
                 }
-                if(rand()%2==0 && !theres_bomb(bombs1,maximumBombs) && totalEnemys>=1){
+                if(rand()%2==0 && !theres_bomb(bombs1,maximumBombs) && totalEnemys<=1){
                     int enemyChoiced = -1;
                     for(int enemy=0;enemy<enemysQuantity;enemy++){
                         if(enemys[enemy].Pos.X==-1 && enemys[enemy].Pos.Y==-1){
@@ -1121,9 +1120,11 @@ int game(InfoType &info){
                             }
                         }
                     }
-                    int y = player1.Pos.Y-enemys[enemyChoiced].Pos.Y;
-                    int x = player1.Pos.X-enemys[enemyChoiced].Pos.X;
-                    found_danger(danger,y,x);
+                    if(enemys[enemyChoiced].Pos.Y!=-1 && enemys[enemyChoiced].Pos.X!=-1){
+                        int y = player1.Pos.Y-enemys[enemyChoiced].Pos.Y;
+                        int x = player1.Pos.X-enemys[enemyChoiced].Pos.X;
+                        found_danger(danger,y,x);
+                    }
                 }
                 for(int tryIt=0;tryIt<11;tryIt++){
                     if(tryIt==10){
@@ -1789,7 +1790,7 @@ int main(){
                                         }
                                         if(deadMenu==1 || deadMenu==3){
                                             info.timer = {0,0,0};
-                                            info.phase = 1;
+                                            info.phase = 3;
                                             info.player1.TotalMoves = 0;
                                             info.player1.Totalbombs = 0;
                                             info.player1.Points = 0;
