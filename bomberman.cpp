@@ -988,7 +988,7 @@ int game(InfoType &info){
                                 if(enemys[enemy].Move == 3){
                                     X--;
                                 }
-                                if(enemys[enemy].Move == 4) {
+                                if(enemys[enemy].Move == 4){
                                     X++;
                                 }
                                 if(((player1.Pos.Y+y == enemys[enemy].Pos.Y+Y && player1.Pos.X+x == enemys[enemy].Pos.X+X) && freezeEnemys==0)){
@@ -1011,7 +1011,7 @@ int game(InfoType &info){
                             if(boss.Move == 3){
                                 X++;
                             }
-                            if(boss.Move == 4) {
+                            if(boss.Move == 4){
                                 X--;
                             }
                             if(((player1.Pos.Y+y == boss.Pos.Y+Y && player1.Pos.X+x == boss.Pos.X+X))){
