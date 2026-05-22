@@ -212,7 +212,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         cout<<"\e[38;5;3m";
     }
     if(player1.Item==0){
-        player1.Slot = 0;
+        if(player1.Slot==4){
+            player1.Slot = 0;
+        }
         cout<<"[ ]";
     }
     if(player1.Item==1){
@@ -292,7 +294,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
             cout<<"\e[38;5;3m";
         }
         if(player2.Item==0){
-            player2.Slot = 0;
+            if(player2.Slot==4){
+                player2.Slot = 0;
+            }
             cout<<"[ ]";
         }
         if(player2.Item==1){
@@ -1428,7 +1432,7 @@ int game(InfoType &info){
                 boss.Pos.Y-=boss.Target.Y;
                 boss.Pos.X-=boss.Target.X;
             }
-            if(rand()%3==0){
+            if(rand()%boss.HP==0){
                 boss.Move = rand()%4+1;
             }
             if(boss.HP>1){
@@ -1719,12 +1723,12 @@ int main(){
                         if(game(info)){
                             if(info.phase>3){
                                 cout<<"\e[12;"<<mapSizeX+3<<"H";
-                                cout << "┃ VITORIA!           ┃\n";
+                                cout << "┃ \e[38;5;46mVITORIA!\e[0m           ┃\n";
                                 deadMenu = 1;
                             }
                         }else{
                             cout<<"\e[12;"<<mapSizeX+3<<"H";
-                            cout << "┃ DERROTA!           ┃\n";
+                            cout << "┃ \e[38;5;9mDERROTA!\e[0m           ┃\n";
                             deadMenu = 1;
                         }
 
