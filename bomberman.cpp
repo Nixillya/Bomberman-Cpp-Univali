@@ -1888,16 +1888,23 @@ int main(){
 
                                 case 5:
                                     new_line("┏","━","┓",80);
-                                    cout << "┃ - Objetivo: Exploda todos os inimigos da fase para ganhar, ou encontre a       ┃\n";
-                                    cout << "┃    saída secreta.                                                              ┃\n";
-                                    cout << "┃ - Você só tem uma vida, colete Auto-Desfibriladores para ganhar vidas extras.  ┃\n";
+                                    cout << "┃ - Objetivo: Exploda todos os inimigos da fase, após isso, o portal para a      ┃\n";
+                                    cout << "┃    próxima fase será aberta. São 3 fases ao total, com a última fase tendo     ┃\n";
+                                    cout << "┃    um Chefão te esperando...                                                   ┃\n";
+                                    cout << "┃ - Você começa apenas com uma vida, colete Vidas Extras para, bem, não morrer   ┃\n";
+                                    cout << "┃    quando levar dano.                                                          ┃\n";
                                     cout << "┃ - Você pode só pode colocar um explosivo por vez, colete Multi-Detonares para  ┃\n";
                                     cout << "┃    poder colocar mais explosivos.                                              ┃\n";
                                     cout << "┃ - A explosão das bombas normais e C4 tem um formato de cruz (+), com um        ┃\n";
                                     cout << "┃    alcançe de 1x1.                                                             ┃\n";
                                     cout << "┃ - Ao colocar uma explosivo, não dá para passar por ela.                        ┃\n";
                                     cout << "┃ - As bombas conseguem destruir paredes frageis, mas não as resistentes.        ┃\n";
-                                    cout << "┃ - PONTUAÇÃO: Você começa com 0 pontos       ┃\n";
+                                    cout << "┃ - Pontuação: Você começa o jogo com 0 pontos.                                  ┃\n";
+                                    cout << "┃ -- Matar um inimigo = + 250 pontos.                                            ┃\n";
+                                    cout << "┃ -- Colocar uma bomba = - 10 pontos.                                            ┃\n";
+                                    cout << "┃ - Na última fase:                                                              ┃\n";
+                                    cout << "┃ -- Causar dano ao Chefão = + 1000 pontos.                                      ┃\n";
+                                    cout << "┃ -- Se os 2 players estiverem vivo = + 500 pontos (para ambos).                 ┃\n";
                                     new_line("┗","━","┛",80);
                                     getch();
                                     cout << "\ec";
@@ -1977,10 +1984,6 @@ int main(){
                                                     new_line("┏","━","┓",109);
                                                     cout << "┃                                      PÁGINA 2 - TRAJES                                                      ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Traje blindado 'Aegis' ( ): Um traje blindando que protege o jogador de qualquer dano (seja de inimigos   ┃\n";
-                                                    cout << "┃   ou de explosões). O traje se quebra ao receber dano, mas, evita que o jogador morra. Ao se quebrar, o     ┃\n";
-                                                    cout << "┃   jogador fica invuneravel por um curto período de tempo.                                                   ┃\n";
-                                                    new_line("┣","━","┫",109);
                                                     cout << "┃ - Prótitpo de traje 'Espectro' (⬘): Um traje experimental que permite o jogador atravesar paredes frágies   ┃\n";
                                                     cout << "┃   por 60 segundos. Após esse tempo, o traje se quebra. Não é possível aumentar o tempo do contador.         ┃\n";
                                                     new_line("┗","━","┛",109);
@@ -1993,15 +1996,13 @@ int main(){
                                                     cout << "┃ - Polvora (▲): Aumenta o raio de explosão do próximo explosivo em 3 células, em todas as direções. É        ┃\n";
                                                     cout << "┃    consumido ao ser usado.                                                                                  ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Multi-detonador ( ): Permite colocar uma segunda bomba padrão em seguida. É consumida ao ser usada.       ┃\n";
+                                                    cout << "┃ - Multi-detonador (⧱): Permite colocar uma segunda bomba padrão em seguida. É consumida ao ser usada.       ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Martelo pneumatico ( ): Quebra as paredes frágeis ao ficar próxima de alguma.                             ┃\n";
+                                                    cout << "┃ - Vida Extra (☤): (Tecnicamente, é um Auto-Desfibrilador) ao levar dano, você revive e fica invulnerável    ┃\n";
+                                                    cout << "┃   por um curto período de tempo                                                                             ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - Prótotipo 'Crono-Hourglass' (⧗): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de     ┃\n";
-                                                    cout << "┃   um inimigo.                                                                                               ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - Prótitpo Manoplas 'Punho de Atlas' ( ): Manoplas sismicas que, quando o usuario soca o chão, ergue uma    ┃\n";
-                                                    cout << "┃   rocha do subsollo na posição atual. Essa rocha possui as mesmas propriedades de uma parede frágil.        ┃\n";                                                                                              \
+                                                    cout << "┃   um inimigo.                                                                                               ┃\n";                                                                                            \
                                                     new_line("┗","━","┛",109);
                                             break;
 
