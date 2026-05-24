@@ -4,8 +4,10 @@
 #include <time.h>
 #include <string>
 #include <fstream>
+#include <SFML/Audio.hpp>
 
 using namespace std;
+using namespace sf;
 
 #define freeBlock 0
 #define solidBlock 1
@@ -314,13 +316,13 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         if(boss.HP==boss.MaxHP){
             cout << "\e["<<mapSizeY+4<<";2H";
             for(int hp=0;hp<boss.HP;hp++){
-                cout<<"\e[48;5;9m\e[38;5;9m  \e[0m";
+                cout<<"\e[48;5;9m\e[38;5;9m \e[0m";
             }
         }
         if(boss.HP<boss.MaxHP){
             cout << "\e["<<mapSizeY+4<<";2H";
             for(int hp=0;hp<boss.HP;hp++){
-                cout<<"\e[48;5;9m\e[38;5;9m  \e[0m";
+                cout<<"\e[48;5;9m\e[38;5;9m \e[0m";
             }
             cout<<"  ";
         }
@@ -385,7 +387,8 @@ void lost_life(PlayerType &player, int &moveEnemy, int &timerClock){
     }
 }
 
-void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType boss){
+int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType boss){
+    int sound = 0;
     for(int enemy = 0; enemy < enemysQuantity; enemy++){
         if(player.Item == 1){
             for(int y = -1; y <= 1; y++){
@@ -394,6 +397,7 @@ void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[],
                         freezeEnemys = 3;
                         player.Item = 0;
                         timerClock = clock();
+                        sound = 3;
                     }
                 }
             }
@@ -401,20 +405,24 @@ void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[],
     }
     if(map[player.Pos.Y][player.Pos.X] == explosionBlock && player.Invincible == 0){
         lost_life(player, moveEnemy, timerClock);
+        sound = 1;
     }
     if((player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X) && player.Invincible == 0){
         lost_life(player, moveEnemy, timerClock);
+        sound = 1;
     }
     for(int enemy = 0; enemy < enemysQuantity; enemy++){
         if ((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) && player.Invincible == 0){
             lost_life(player, moveEnemy, timerClock);
+            sound = 1;
         }
     }
     for(int box = 0; box < fragileWallQuantity; box++){
         if(player.Pos.Y == boxs[box].Pos.Y && player.Pos.X == boxs[box].Pos.X){
+            sound = 2;
             boxs[box].Pos.Y = -1;
             boxs[box].Pos.X = -1;
-            if (rand() % 4 != 0 || player.Item != 0){
+            if (rand() % 2 != 0 || player.Item != 0){
                 int item = rand() % 3;
                 if (item == 0){
                     player.MaxBombs++;
@@ -439,9 +447,10 @@ void player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[],
             }
         }
     }
+    return sound;
 }
 
-void player_verifier(PlayerType &player, int maximumBombs){
+void player_sync(PlayerType &player, int maximumBombs){
     if(player.ActualBomb>=maximumBombs){
         player.ActualBomb = 0;
     }
@@ -455,7 +464,8 @@ void player_verifier(PlayerType &player, int maximumBombs){
     }
 }
 
-void bombs_explosion(InfoType info,BossType boss,BombType bombs[], int bomb, PlayerType &player, int map[mapSizeY][mapSizeX], BombType explosions[], int enemysQuantity, EnemyType enemys[]){
+int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, PlayerType &player, int map[mapSizeY][mapSizeX], BombType explosions[], int enemysQuantity, EnemyType enemys[]){
+    int sound = 0;
     bombs[bomb].Range = player.MaxRange;
     if (player.Item == 3){
         player.Item = 0;
@@ -474,6 +484,7 @@ void bombs_explosion(InfoType info,BossType boss,BombType bombs[], int bomb, Pla
         bombs[bomb].Pos.Y = -1;
         bombs[bomb].Pos.X = -1;
         bombs[bomb].Time = 0;
+        sound = 1;
     }
     if (explosions[bomb].Pos.Y > 0 && explosions[bomb].Pos.X > 0 && ((clock() - explosions[bomb].Time) >= 1350)){
         for (int enemy = 0; enemy < enemysQuantity; enemy++){
@@ -482,10 +493,12 @@ void bombs_explosion(InfoType info,BossType boss,BombType bombs[], int bomb, Pla
                     if(info.phase!=3){
                         player.Points += 200;
                     }else{
-                        player.Points += 25;
+                        player.Points += 500;
                     }
                     enemys[enemy].Pos.Y = -1;
                     enemys[enemy].Pos.X = -1;
+                    boss.HP--;
+                    sound = 2;
                 }
             }
         }
@@ -500,6 +513,7 @@ void bombs_explosion(InfoType info,BossType boss,BombType bombs[], int bomb, Pla
         explosions[bomb].Pos.X = -1;
         explosions[bomb].Time = 0;
     }
+    return sound;
 }
 
 void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &target, BombType bombs[],int map[mapSizeY][mapSizeX], bool putBomb){
@@ -530,6 +544,43 @@ void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &tar
 }
 
 int game(InfoType &info){
+    //------------------------> SONS >------------------------//
+    int sound1 = 0;
+    int sound2 = 0;
+
+    SoundBuffer ampulhetaBF;
+    if(!ampulhetaBF.loadFromFile("Sounds/ampulheta.wav")){}
+    Sound ampulhetaSD(ampulhetaBF);
+
+    SoundBuffer espectroBF;
+    if(!espectroBF.loadFromFile("Sounds/espectro.wav")){}
+    Sound espectroSD(espectroBF);
+
+    SoundBuffer explosaoBF;
+    if(!explosaoBF.loadFromFile("Sounds/explosao.wav")){}
+    Sound explosaoSD(explosaoBF);
+    explosaoSD.setVolume(30);
+
+    SoundBuffer morteInimigoBF;
+    if(!morteInimigoBF.loadFromFile("Sounds/morte_inimigo.wav")){}
+    Sound morteInimigoSD(morteInimigoBF);
+
+    SoundBuffer musicaFaseBF;
+    if(!musicaFaseBF.loadFromFile("Sounds/musica_fase.wav")){}
+    Sound musicaFaseSD(musicaFaseBF);
+    musicaFaseSD.setLooping(true);
+    musicaFaseSD.setVolume(25);
+    musicaFaseSD.play();
+
+    SoundBuffer pegandoLootBF;
+    if(!pegandoLootBF.loadFromFile("Sounds/pegando_loot.wav")){}
+    Sound pegandoLootSD(pegandoLootBF);
+
+    SoundBuffer perdeuVidaBF;
+    if(!perdeuVidaBF.loadFromFile("Sounds/perdeu_vida.wav")){}
+    Sound perdeuVidaSD(perdeuVidaBF);
+    //------------------------< SONS <------------------------//
+
     //------------------------> VARIAVEIS GERAIS >------------------------//
     int enemysQuantity;
     if(info.difficulty==1){
@@ -547,13 +598,13 @@ int game(InfoType &info){
     BossType boss;
     if(info.phase == 3){
         if(info.difficulty==1){
-            boss.HP = 3;
+            boss.HP = 10;
         }
         if(info.difficulty==2){
-            boss.HP = 5;
+            boss.HP = 15;
         }
         if(info.difficulty==3){
-            boss.HP = 10;
+            boss.HP = 25;
         }
         boss.MaxHP = boss.HP;
         boss.Alive = true;
@@ -757,16 +808,16 @@ int game(InfoType &info){
     new_line("┗","━","┛",14);
     if(info.phase==3){
         cout << "\e["<<mapSizeY+3<<";1H";
-        new_line("┏","━","┓",boss.MaxHP*2);
-        new_line("┃"," ","┃",boss.MaxHP*2);
-        new_line("┗","━","┛",boss.MaxHP*2);
+        new_line("┏","━","┓",boss.MaxHP);
+        new_line("┃"," ","┃",boss.MaxHP);
+        new_line("┗","━","┛",boss.MaxHP);
     }
 //------------------------< BORDAS LATERAIS <------------------------//
 
 //---------------------------> RENDERIZAÇÃO DO MAPA >---------------------------//
     while(true){
-        player_verifier(player1,maximumBombs);
-        player_verifier(player2,maximumBombs);
+        player_sync(player1,maximumBombs);
+        player_sync(player2,maximumBombs);
 
         info.player1.Alive = player1.Alive;
         info.player1.Points = player1.Points;
@@ -940,8 +991,19 @@ int game(InfoType &info){
             info.phase++;
             return 1;
         }
-        player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
-        player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+        sound1 = 0;
+        sound2 = 0;
+        sound1 = player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+        sound2 = player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+        if(sound1==1 || sound2==1){
+            perdeuVidaSD.play();
+        }
+        if(sound1==2 || sound2==2){
+            pegandoLootSD.play();
+        }
+        if(sound1==3 || sound2==3){
+            espectroSD.play();
+        }
 
         if (kbhit() || info.players==1){
             PositionType target1;
@@ -1442,7 +1504,7 @@ int game(InfoType &info){
                 }
             }
             if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
-                boss.HP-=1;
+                boss.HP--;
                 boss.Move = rand()%4+1;
                 if(player1.Alive && player2.Alive){
                     player1.Points += 500;
@@ -1454,6 +1516,7 @@ int game(InfoType &info){
                 if(player2.Alive){
                     player2.Points += 1000;
                 }
+                morteInimigoSD.play();
             }
             if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
                 map[boss.Pos.Y][boss.Pos.X] = freeBlock;
@@ -1473,7 +1536,7 @@ int game(InfoType &info){
                     boxs[box].Pos.X = -1;    
                 }
             }
-            if(rand()%3==0){
+            if(rand()%10==0){
                 bool success = false;
                 for(int y=-1;y<=1;y++){
                     if(success){
@@ -1513,9 +1576,21 @@ int game(InfoType &info){
 //-----------------------------------> SISTEMA DAS BOMBAS >-----------------------------------//
         player1.ActualBomb++;
         player2.ActualBomb++;
+        sound1 = 0;
+        sound2 = 0;
         for(int bomb=0;bomb<maximumBombs;bomb++){
-            bombs_explosion(info, boss,bombs1, bomb, player1, map, explosions1, enemysQuantity, enemys);
-            bombs_explosion(info, boss,bombs2, bomb, player2, map, explosions2, enemysQuantity, enemys);
+            if(sound1==0){
+                sound1 = bombs_explosion(info, boss,bombs1, bomb, player1, map, explosions1, enemysQuantity, enemys);
+            }
+            if(sound2==0){
+                sound2 = bombs_explosion(info, boss,bombs2, bomb, player2, map, explosions2, enemysQuantity, enemys);
+            }
+        }
+        if(sound1 == 1 || sound2 == 1){
+            explosaoSD.play();
+        }
+        if(sound1 == 2 || sound2 == 2){
+            morteInimigoSD.play();
         }
 //-----------------------------------< SISTEMA DAS BOMBAS <-----------------------------------//
 
@@ -1552,6 +1627,18 @@ int game(InfoType &info){
 int main(){
     SetConsoleOutputCP(CP_UTF8);
 
+    SoundBuffer MovendoPeloMenuBF;
+    if(!MovendoPeloMenuBF.loadFromFile("Sounds/movendo_pelo_menu.wav")){}
+    Sound MovendoPeloMenuSD(MovendoPeloMenuBF);
+    MovendoPeloMenuSD.setVolume(25);
+
+    SoundBuffer musicaMenuBF;
+    if(!musicaMenuBF.loadFromFile("Sounds/musica_menu.wav")){}
+    Sound musicaMenuSD(musicaMenuBF);
+    musicaMenuSD.setVolume(10);
+    musicaMenuSD.setLooping(true);
+    musicaMenuSD.play();
+
     bool running = true;
     int verticalMenu = 4;
     int codex = 4;
@@ -1585,6 +1672,7 @@ int main(){
         }
         new_line("┗","━","┛",15);
         int key = getch();
+        MovendoPeloMenuSD.play();
         switch(key){
             case 119: // Ir para cima
                 verticalMenu--;
@@ -1663,6 +1751,7 @@ int main(){
                         cout << "\e[6;18H";
                         new_line("┗","━","┛",24);
                         int key = getch();
+                        MovendoPeloMenuSD.play();
                         switch(key){
                             case 119: // Ir para cima
                                 gameMenu--;
@@ -1706,6 +1795,7 @@ int main(){
                             break;
                             case 13:
                                 if(gameMenu==3){
+                                    musicaMenuSD.stop();
                                     success = true;
                                 }
                             break;
