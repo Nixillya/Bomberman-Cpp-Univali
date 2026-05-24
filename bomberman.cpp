@@ -691,7 +691,7 @@ int game(InfoType &info){
                             success = false;
                         }
                     }
-                    if(rand()%2==0 && success){
+                    if(rand()%4==0 && success){
                         int idx = rand()%fragileWallQuantity;
                         boxs[idx].Pos.Y=y;
                         boxs[idx].Pos.X=x;
@@ -1035,7 +1035,13 @@ int game(InfoType &info){
                 key = 0;
                 int danger[4] = {-1,-1,-1,-1};
                 int totalEnemys = 0;
+                int priority = 0;
                 bool putBomb = false;
+                if(boss.Alive){
+                    priority = 1;
+                }else{
+                    priority = 2;
+                }
                 for(int y=-1;y<=1;y++){
                     for(int x=-1;x<=1;x++){
                         if((y==0||x==0)){
@@ -1103,6 +1109,12 @@ int game(InfoType &info){
                         }
                     }
                 }
+                if(totalEnemys>0){
+                    priority = 2;
+                }
+                if(portal.Pos.Y!=-1 && portal.Pos.X!=-1){
+                    priority = 3;
+                }
                 for(int y=-2;y<=2;y++){
                     for(int x=-2;x<=2;x++){
                         if((player1.Pos.Y+y>0 && player1.Pos.Y+y<mapSizeY && player1.Pos.X+x>0 && player1.Pos.X+x<mapSizeX)){
@@ -1114,7 +1126,7 @@ int game(InfoType &info){
                                 }
                             }
                             if(((y>=-1&&x>=-1) && (y<=1&&x<=1)) || (y==0||x==0)){
-                                if(totalEnemys>0 || map[player1.Pos.Y][player1.Pos.X]==bombBlock){
+                                if(map[player1.Pos.Y][player1.Pos.X]==bombBlock){
                                     if(y==-2 && x==0){
                                         if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
                                             int y1 = y+1;
@@ -1176,7 +1188,12 @@ int game(InfoType &info){
                 for(int i=0;i<4;i++){
                     safes += (danger[i]==-1) ? 1 : 0;
                 }
-                if(rand()%2==0 && !theres_bomb(bombs1,maximumBombs) && totalEnemys<=1){
+                if(!theres_bomb(bombs1,maximumBombs) && totalEnemys<=1 && priority==1){
+                    int y = player1.Pos.Y-boss.Pos.Y;
+                    int x = player1.Pos.X-boss.Pos.X;
+                    found_danger(danger,y,x);
+                }
+                if(rand()%2==0 && !theres_bomb(bombs1,maximumBombs) && totalEnemys<=1 && priority==2){
                     int enemyChoiced = -1;
                     for(int enemy=0;enemy<enemysQuantity;enemy++){
                         if(enemys[enemy].Pos.X==-1 && enemys[enemy].Pos.Y==-1){
@@ -1197,6 +1214,11 @@ int game(InfoType &info){
                         int x = player1.Pos.X-enemys[enemyChoiced].Pos.X;
                         found_danger(danger,y,x);
                     }
+                }
+                if(rand()%2==0 && !theres_bomb(bombs1,maximumBombs) && priority==3){
+                    int y = player1.Pos.Y-portal.Pos.Y;
+                    int x = player1.Pos.X-portal.Pos.X;
+                    found_danger(danger,y,x);
                 }
                 for(int tryIt=0;tryIt<11;tryIt++){
                     if(tryIt==10){
@@ -1725,7 +1747,6 @@ int main(){
                     bool success = false;
                     int gameMenu = 1;
                     InfoType info;
-                    info.phase = 3;
                     while(true){
                         bool kill = false;
                         cout << "\e[?25l\e[1;18H";
@@ -1915,7 +1936,7 @@ int main(){
                                         }
                                         if(deadMenu==1 || deadMenu==3){
                                             info.timer = {0,0,0};
-                                            info.phase = 3;
+                                            info.phase = 1;
                                             info.player1.TotalMoves = 0;
                                             info.player1.Totalbombs = 0;
                                             info.player1.Points = 0;
