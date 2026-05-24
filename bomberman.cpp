@@ -15,7 +15,6 @@ using namespace sf;
 #define bombBlock 3
 #define explosionBlock 4
 
-
 struct XY{
     int X=-1; 
     int Y=-1;
@@ -53,7 +52,7 @@ struct PlayerType{
     int MaxRange = 1;
     int Lifes = 1;
     int ActualBomb = 0;
-    int Invincible = 4;
+    int Invincible = 3;
     int Item = 0;
     int Slot = 0;
     int TotalMoves = 0;
@@ -312,23 +311,17 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         }
         cout<<"\e[0m";
     }
+    cout << "\e["<<mapSizeY+4<<";2H";
     if(boss.Alive){
-        if(boss.HP==boss.MaxHP){
-            cout << "\e["<<mapSizeY+4<<";2H";
-            for(int hp=0;hp<boss.HP;hp++){
+        for(int hp=0;hp<boss.MaxHP;hp++){
+            if(hp<boss.HP){
                 cout<<"\e[48;5;9m\e[38;5;9m \e[0m";
+            }else{
+                cout<<"\e[48;5;0m\e[38;5;0m \e[0m";
             }
-        }
-        if(boss.HP<boss.MaxHP){
-            cout << "\e["<<mapSizeY+4<<";2H";
-            for(int hp=0;hp<boss.HP;hp++){
-                cout<<"\e[48;5;9m\e[38;5;9m \e[0m";
-            }
-            cout<<"  ";
         }
     }else{
-        cout<<"\e["<<mapSizeY+4<<";2H";
-        cout<<"  ";
+        new_line(""," ","", boss.MaxHP);
     }
 }
 
@@ -372,7 +365,7 @@ void lost_life(PlayerType &player, int &moveEnemy, int &timerClock){
         player.Slot = 0;
     }
     if (player.Lifes >= 1){
-        player.Points -= 200;
+        player.Points -= 250;
         player.MaxBombs = 1;
         player.MaxRange = 1;
         moveEnemy = clock();
@@ -467,14 +460,14 @@ void player_sync(PlayerType &player, int maximumBombs){
 int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, PlayerType &player, int map[mapSizeY][mapSizeX], BombType explosions[], int enemysQuantity, EnemyType enemys[]){
     int sound = 0;
     bombs[bomb].Range = player.MaxRange;
-    if (player.Item == 3){
-        player.Item = 0;
-        bombs[bomb].Range = 1000;
-    }
     if (map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] == freeBlock){
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = bombBlock;
     }
     if (bombs[bomb].Pos.Y > 0 && bombs[bomb].Pos.X > 0 && ((clock() - bombs[bomb].Time) >= 1000)){
+        if(player.Item == 3){
+            player.Item = 0;
+            bombs[bomb].Range = 1000;
+        }
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = explosionBlock;
         explode(map, bombs[bomb], 1, 0);
         explode(map, bombs[bomb], 0, 1);
@@ -490,14 +483,12 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
         for (int enemy = 0; enemy < enemysQuantity; enemy++){
             if(map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X] == explosionBlock){
                 if(enemys[enemy].Pos.Y != -1 && enemys[enemy].Pos.X != -1){
-                    if(info.phase!=3){
-                        player.Points += 200;
-                    }else{
-                        player.Points += 500;
-                    }
+                    player.Points += 250;
                     enemys[enemy].Pos.Y = -1;
                     enemys[enemy].Pos.X = -1;
-                    boss.HP--;
+                    if(boss.HP>1){
+                        boss.HP--;
+                    }
                     sound = 2;
                 }
             }
@@ -598,15 +589,15 @@ int game(InfoType &info){
     BossType boss;
     if(info.phase == 3){
         if(info.difficulty==1){
-            boss.HP = 10;
+            boss.MaxHP = 10;
         }
         if(info.difficulty==2){
-            boss.HP = 15;
+            boss.MaxHP = 15;
         }
         if(info.difficulty==3){
-            boss.HP = 25;
+            boss.MaxHP = 25;
         }
-        boss.MaxHP = boss.HP;
+        boss.HP = boss.MaxHP;
         boss.Alive = true;
     }
 
@@ -685,6 +676,25 @@ int game(InfoType &info){
                             boxs[i].Pos.X=fragil.Pos.X;
                         }
                         break;
+                    }
+                }
+            }
+        }
+    }else{
+        for (int y = 0; y < mapSizeY; y += 2){
+            for (int x = 0; x < mapSizeX; x += 2){
+                if(map[y][x]==freeBlock){
+                    map[y][x] = fragileBlock;
+                    bool success = true;
+                    for(int i=0; i < fragileWallQuantity; i++){
+                        if(boxs[i].Pos.Y==y && boxs[i].Pos.X==x){
+                            success = false;
+                        }
+                    }
+                    if(rand()%2==0 && success){
+                        int idx = rand()%fragileWallQuantity;
+                        boxs[idx].Pos.Y=y;
+                        boxs[idx].Pos.X=x;
                     }
                 }
             }
@@ -839,9 +849,9 @@ int game(InfoType &info){
                     if(y==boss.Pos.Y && x==boss.Pos.X){
                         block = false;
                         if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
-                            cout << "\e[31;43m\u25A1";
+                            cout << "\e[0;43m\e[38;5;124m\u25A1";
                         }else{
-                            cout << "\e[31;42m\u25A0"; // BOSS
+                            cout << "\e[0;42m\e[38;5;124m\u25A0"; // BOSS
                         }
                     }
                  }
@@ -1468,99 +1478,115 @@ int game(InfoType &info){
                 }
             }
         }
-        if(boss.HP<=0){
-            boss.HP = 0;
-            boss.Pos.Y = -1;
-            boss.Pos.X = -1;
-            boss.Alive = false;
-        }
-        if(boss.Alive == true){
-            boss.Target.Y = 0;
-            boss.Target.X = 0;
-            if(boss.Move==1){
-                boss.Target.Y++;
-            }
-            if(boss.Move==2){
-                boss.Target.Y--;
-            }
-            if(boss.Move==3){
-                boss.Target.X++;
-            }
-            if(boss.Move==4){
-                boss.Target.X--;
-            }
-            boss.Pos.Y+=boss.Target.Y;
-            boss.Pos.X+=boss.Target.X;
-            if(((boss.Pos.Y <= 0 || boss.Pos.Y >= mapSizeY-1) || (boss.Pos.X <= 0 || boss.Pos.X >= mapSizeX-1)) || map[boss.Pos.Y][boss.Pos.X]==explosionBlock || map[boss.Pos.Y][boss.Pos.X]==bombBlock){
-                boss.Pos.Y-=boss.Target.Y;
-                boss.Pos.X-=boss.Target.X;
-            }
-            if(rand()%boss.HP==0){
-                boss.Move = rand()%4+1;
-            }
-            if(boss.HP>1){
-                if(rand()%2==0){
+        if(boss.Alive){
+            if(clock()-boss.Clock >= 100){
+                boss.Clock = clock();
+                boss.Target.Y = 0;
+                boss.Target.X = 0;
+                if(boss.Move==1){
+                    boss.Target.Y++;
+                }
+                if(boss.Move==2){
+                    boss.Target.Y--;
+                }
+                if(boss.Move==3){
+                    boss.Target.X++;
+                }
+                if(boss.Move==4){
+                    boss.Target.X--;
+                }
+                if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
+                    boss.HP--;
+                    if(boss.HP<0){
+                        boss.HP = 0;
+                    }
+                    if(player1.Alive && player2.Alive){
+                        player1.Points += 250;
+                        player2.Points += 250;
+                    }
+                    if(player1.Alive){
+                        player1.Points += 500;
+                    }
+                    if(player2.Alive){
+                        player2.Points += 500;
+                    }
+                    morteInimigoSD.play();
+                }
+                boss.Pos.Y+=boss.Target.Y;
+                boss.Pos.X+=boss.Target.X;
+                
+                if(rand()%4==0){
+                    if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
+                        map[boss.Pos.Y][boss.Pos.X] = freeBlock;
+                        boss.Pos.Y-=boss.Target.Y;
+                        boss.Pos.X-=boss.Target.X;
+                    }
+                }
+                if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock || map[boss.Pos.Y][boss.Pos.X]==bombBlock || map[boss.Pos.Y][boss.Pos.X]==solidBlock || map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
+                    boss.Pos.Y-=boss.Target.Y;
+                    boss.Pos.X-=boss.Target.X;
+                }
+                if(boss.HP>0){
+                    if(rand()%boss.HP==0){
+                        boss.Move = rand()%4+1;
+                    }
+                }
+                if(boss.HP>1){
+                    if(rand()%4==0){
+                        boss.Move = 0;
+                    }
+                }
+                if(theres_bomb(bombs1,maximumBombs) || theres_bomb(bombs2,maximumBombs)){
+                    if(rand()%2==0){
+                        boss.Move = rand()%4+1;
+                    }
+                }
+                if(boss.HP>0){
+                    if(boss.Move==0){
+                        if(rand()%boss.HP==0){
+                            int enemy = rand()%enemysQuantity;
+                            enemys[enemy].Pos.Y = boss.Pos.Y;
+                            enemys[enemy].Pos.X = boss.Pos.X;
+                        }
+                    }
+                }
+                if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
                     boss.Move = 0;
                 }
-            }
-            if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
-                boss.HP--;
-                boss.Move = rand()%4+1;
-                if(player1.Alive && player2.Alive){
-                    player1.Points += 500;
-                    player2.Points += 500;
-                }
-                if(player1.Alive){
-                    player1.Points += 1000;
-                }
-                if(player2.Alive){
-                    player2.Points += 1000;
-                }
-                morteInimigoSD.play();
-            }
-            if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
-                map[boss.Pos.Y][boss.Pos.X] = freeBlock;
-            }
-            if(boss.Move==0){
-                if(rand()%(boss.HP*15)==0){
-                    int enemy = rand()%enemysQuantity;
-                    enemys[enemy].Pos.Y = boss.Pos.Y;
-                    enemys[enemy].Pos.X = boss.Pos.X;
-                }
-            }
-            int BlockY = rand()%mapSizeY;
-            int BlockX = rand()%mapSizeX;
-            for(int box=0;box<fragileWallQuantity;box++){
-                if(boxs[box].Pos.Y == boss.Pos.Y && boxs[box].Pos.X == boss.Pos.X){
-                    boxs[box].Pos.Y = -1;
-                    boxs[box].Pos.X = -1;    
-                }
-            }
-            if(rand()%10==0){
-                bool success = false;
-                for(int y=-1;y<=1;y++){
-                    if(success){
-                        break;
+                int BlockY = rand()%mapSizeY;
+                int BlockX = rand()%mapSizeX;
+                for(int box=0;box<fragileWallQuantity;box++){
+                    if(boxs[box].Pos.Y == boss.Pos.Y && boxs[box].Pos.X == boss.Pos.X){
+                        boxs[box].Pos.Y = -1;
+                        boxs[box].Pos.X = -1;    
                     }
-                    for(int x=-1;x<=1;x++){
+                }
+                if(rand()%10==0){
+                    bool success = false;
+                    for(int y=-1;y<=1;y++){
                         if(success){
                             break;
                         }
-                        if((y==0 || x==0)){
-                            if(map[BlockY][BlockX]==freeBlock){
-                                if(map[BlockY+y][BlockX+x] == solidBlock || map[BlockY+y][BlockX+x] == fragileBlock){
-                                    map[BlockY][BlockX] = fragileBlock;
-                                    success = true;
-                                    if(rand()%10==0){
-                                        for(int box=0;box<fragileWallQuantity;box++){
-                                            if(boxs[box].Pos.Y == BlockY && boxs[box].Pos.X == BlockX){
-                                                boxs[box].Pos.Y = -1;
-                                                boxs[box].Pos.X = -1;
-                                            }
-                                            if(boxs[box].Pos.Y == -1 && boxs[box].Pos.X == -1){
-                                                boxs[box].Pos.Y = BlockY;
-                                                boxs[box].Pos.X = BlockX;
-                                                break;
+                        for(int x=-1;x<=1;x++){
+                            if(success){
+                                break;
+                            }
+                            if((y==0 || x==0)){
+                                if(map[BlockY][BlockX]==freeBlock){
+                                    if(map[BlockY+y][BlockX+x] == solidBlock || map[BlockY+y][BlockX+x] == fragileBlock){
+                                        map[BlockY][BlockX] = fragileBlock;
+                                        success = true;
+                                        if(rand()%4==0){
+                                            for(int box=0;box<fragileWallQuantity;box++){
+                                                if(boxs[box].Pos.Y == BlockY && boxs[box].Pos.X == BlockX){
+                                                    boxs[box].Pos.Y = -1;
+                                                    boxs[box].Pos.X = -1;
+                                                }
+                                                if(boxs[box].Pos.Y == -1 && boxs[box].Pos.X == -1){
+                                                    boxs[box].Pos.Y = BlockY;
+                                                    boxs[box].Pos.X = BlockX;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -1571,6 +1597,12 @@ int game(InfoType &info){
                 }
             }
         }
+        if(boss.HP<=0){
+            boss.HP = 0;
+            boss.Pos.Y = -1;
+            boss.Pos.X = -1;
+            boss.Alive = false;
+        }
 //----------------------------< SISTEMA DOS INIMIGOS <----------------------------//
 
 //-----------------------------------> SISTEMA DAS BOMBAS >-----------------------------------//
@@ -1580,10 +1612,10 @@ int game(InfoType &info){
         sound2 = 0;
         for(int bomb=0;bomb<maximumBombs;bomb++){
             if(sound1==0){
-                sound1 = bombs_explosion(info, boss,bombs1, bomb, player1, map, explosions1, enemysQuantity, enemys);
+                sound1 = bombs_explosion(info,boss,bombs1, bomb, player1, map, explosions1, enemysQuantity, enemys);
             }
             if(sound2==0){
-                sound2 = bombs_explosion(info, boss,bombs2, bomb, player2, map, explosions2, enemysQuantity, enemys);
+                sound2 = bombs_explosion(info,boss,bombs2, bomb, player2, map, explosions2, enemysQuantity, enemys);
             }
         }
         if(sound1 == 1 || sound2 == 1){
@@ -1596,6 +1628,8 @@ int game(InfoType &info){
 
 //------------------------------> TIMER >------------------------------//
         if((clock()-timerClock)>=1000){
+            player1.Points--;
+            player2.Points--;
             if(player1.Invincible>0){
                 player1.Invincible--;
             }
@@ -1860,6 +1894,7 @@ int main(){
                                 cout<<"\e[17;"<<mapSizeX+3<<"H";
                                 new_line("┗","━","┛",20);
                                 int key = getch();
+                                MovendoPeloMenuSD.play();
                                 switch(key){
                                     case 119: // Ir para cima
                                         deadMenu--;
@@ -1948,6 +1983,7 @@ int main(){
                         new_line("┗","━","┛",15);
 
                         int key = getch();
+                        MovendoPeloMenuSD.play();
 
                         switch (key){
                         case 72: case 'w': case 'W': // Ir para cima
