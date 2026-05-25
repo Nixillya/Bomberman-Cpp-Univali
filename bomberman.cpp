@@ -365,11 +365,6 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = bombBlock;
     }
     if (bombs[bomb].Pos.Y > 0 && bombs[bomb].Pos.X > 0 && ((clock() - bombs[bomb].Time) >= 1000)){
-        bombs[bomb].Range = player.MaxRange;
-        if(player.Item == 3){
-            player.Item = 0;
-            bombs[bomb].Range = 1000;
-        }
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = explosionBlock;
         explode(map, bombs[bomb], 1, 0);
         explode(map, bombs[bomb], 0, 1);
@@ -515,6 +510,11 @@ void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &tar
     if(putBomb){
         player.Totalbombs++;
         player.Points -= 10;
+        bombs[player.ActualBomb].Range = player.MaxRange;
+        if(player.Item == 3){
+            player.Item = 0;
+            bombs[player.ActualBomb].Range = 1000;
+        }
         bombs[player.ActualBomb].Pos.Y = player.Pos.Y;
         bombs[player.ActualBomb].Pos.X = player.Pos.X;
         bombs[player.ActualBomb].Time = clock();
@@ -1896,7 +1896,7 @@ int main(){
                         cout<<"\e[10;"<<mapSizeX+3<<"H";
                         new_line("┃"," ","┃",20);
                         cout<<"\e[10;"<<mapSizeX+3<<"H";
-                        cout<<"┃P: "<<info.maxPoints;
+                        cout<<"┃P: \e[38;5;46m"<<info.maxPoints<<"\e[0m";
 
                         cout<<"\e[11;"<<mapSizeX+3<<"H";
                         new_line("┣","━","┫",20);
