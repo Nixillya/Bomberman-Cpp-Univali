@@ -1054,15 +1054,6 @@ int game(InfoType &info){
                                     found_danger(danger,y,x);
                                 }
                             }
-                            for(int bomb=0;bomb<maximumBombs;bomb++){
-                                if((player1.Pos.Y+y == bombs1[bomb].Pos.Y || player1.Pos.X+x == bombs1[bomb].Pos.X)){
-                                    if(map[player1.Pos.Y][player1.Pos.X]!=bombBlock){
-                                        int Y = (0-player1.Pos.Y)+bombs1[bomb].Pos.Y;
-                                        int X = (0-player1.Pos.X)+bombs1[bomb].Pos.X;
-                                        found_danger(danger,Y,X);
-                                    }
-                                }
-                            }
                             for(int enemy=0;enemy<enemysQuantity;enemy++){
                                 if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
                                     found_danger(danger,y,x);
@@ -1087,26 +1078,45 @@ int game(InfoType &info){
                                     found_danger(danger,y,x);
                                 }
                             }
-                            if((player1.Pos.Y+y == boss.Pos.Y && player1.Pos.X+x == boss.Pos.X)){
-                                found_danger(danger,y,x);
-                                putBomb = true;
+                            if(boss.Alive){
+                                if((player1.Pos.Y+y == boss.Pos.Y && player1.Pos.X+x == boss.Pos.X)){
+                                    found_danger(danger,y,x);
+                                    putBomb = true;
+                                }
+                                int Y = 0;
+                                int X = 0;
+                                if(boss.Move == 1){
+                                    Y++;
+                                }
+                                if(boss.Move == 2){
+                                    Y--;
+                                }
+                                if(boss.Move == 3){
+                                    X++;
+                                }
+                                if(boss.Move == 4){
+                                    X--;
+                                }
+                                if(((player1.Pos.Y+y == boss.Pos.Y+Y && player1.Pos.X+x == boss.Pos.X+X))){
+                                    found_danger(danger,y,x);
+                                }
                             }
-                            int Y = 0;
-                            int X = 0;
-                            if(boss.Move == 1){
-                                Y++;
+                            int safes = 0;
+                            for(int i=0;i<4;i++){
+                                if(danger[i]==-1){
+                                    safes++;
+                                }
                             }
-                            if(boss.Move == 2){
-                                Y--;
-                            }
-                            if(boss.Move == 3){
-                                X++;
-                            }
-                            if(boss.Move == 4){
-                                X--;
-                            }
-                            if(((player1.Pos.Y+y == boss.Pos.Y+Y && player1.Pos.X+x == boss.Pos.X+X))){
-                                found_danger(danger,y,x);
+                            if(safes>=2){
+                                for(int bomb=0;bomb<maximumBombs;bomb++){
+                                    if((player1.Pos.Y+y == bombs1[bomb].Pos.Y || player1.Pos.X+x == bombs1[bomb].Pos.X)){
+                                        if(map[player1.Pos.Y][player1.Pos.X]!=bombBlock){
+                                            int Y = (0-player1.Pos.Y)+bombs1[bomb].Pos.Y;
+                                            int X = (0-player1.Pos.X)+bombs1[bomb].Pos.X;
+                                            found_danger(danger,Y,X);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -1127,57 +1137,56 @@ int game(InfoType &info){
                                     }
                                 }
                             }
-                            if(((y>=-1&&x>=-1) && (y<=1&&x<=1)) || (y==0||x==0)){
-                                if(map[player1.Pos.Y][player1.Pos.X]==bombBlock){
-                                    if(y==-2 && x==0){
-                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                            int y1 = y+1;
-                                            int x1 = x-1;
-                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                int y2 = y1;
-                                                int x2 = x1+2;
-                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                    found_danger(danger,y,x);
-                                                }
+                            if(map[player1.Pos.Y][player1.Pos.X]==bombBlock){
+                                putBomb = false;
+                                if(y==-2 && x==0){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y+1;
+                                        int x1 = x-1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1;
+                                            int x2 = x1+2;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
                                             }
                                         }
                                     }
-                                    if(y==0 && x==2){
-                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                            int y1 = y-1;
-                                            int x1 = x-1;
-                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                int y2 = y1+2;
-                                                int x2 = x1;
-                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                    found_danger(danger,y,x);
-                                                }
+                                }
+                                if(y==0 && x==2){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y-1;
+                                        int x1 = x-1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1+2;
+                                            int x2 = x1;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
                                             }
                                         }
                                     }
-                                    if(y==2 && x==0){
-                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                            int y1 = y-1;
-                                            int x1 = x+1;
-                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                int y2 = y1;
-                                                int x2 = x1-2;
-                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                    found_danger(danger,y,x);
-                                                }
+                                }
+                                if(y==2 && x==0){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y-1;
+                                        int x1 = x+1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1;
+                                            int x2 = x1-2;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
                                             }
                                         }
                                     }
-                                    if(y==0 && x==-2){
-                                        if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                            int y1 = y+1;
-                                            int x1 = x+1;
-                                            if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                                int y2 = y1-2;
-                                                int x2 = x1;
-                                                if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                    found_danger(danger,y,x);
-                                                }
+                                }
+                                if(y==0 && x==-2){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y+1;
+                                        int x1 = x+1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1-2;
+                                            int x2 = x1;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
                                             }
                                         }
                                     }
@@ -1904,10 +1913,14 @@ int main(){
                                     cout<<"┃ [REINICIAR]        ┃\n";
                                 }
                                 cout<<"\e[15;"<<mapSizeX+3<<"H";
-                                if(deadMenu==2){
-                                    cout<<"┃\e[93m  [SALVAR]          \e[0m┃\n";
+                                if(info.players==1){
+                                    cout<<"┃                    ┃\n";
                                 }else{
-                                    cout<<"┃ [SALVAR]           ┃\n";
+                                    if(deadMenu==2){
+                                        cout<<"┃\e[93m  [SALVAR]          \e[0m┃\n";
+                                    }else{
+                                        cout<<"┃ [SALVAR]           ┃\n";
+                                    }
                                 }
                                 cout<<"\e[16;"<<mapSizeX+3<<"H";   
                                 if(deadMenu==3){
@@ -1925,11 +1938,17 @@ int main(){
                                         if (deadMenu < 1) {
                                             deadMenu = 3;
                                         }
+                                        if(info.players==1 && deadMenu==2){
+                                            deadMenu = 1;
+                                        }
                                     break;
                                     case 115: // Ir para baixo
                                         deadMenu++;
                                         if (deadMenu > 3) {
                                             deadMenu = 1;
+                                        }
+                                        if(info.players==1 && deadMenu==2){
+                                            deadMenu = 3;
                                         }
                                     break;
                                     case 13:
@@ -2030,7 +2049,7 @@ int main(){
                                     cout << "┃               Baixo                          ┃\n";
                                     cout << "┃                                              ┃\n";
                                     new_line("┣","━","┫",46);
-                                    cout << "┃ ( Espace ) -> Impaltar explosivo             ┃\n";
+                                    cout << "┃ ( Espace ) -> Colocar explosivo              ┃\n";
                                     new_line("┗","━","┛",46);
                                     getch();
                                     cout << "\ec";
@@ -2039,23 +2058,25 @@ int main(){
                                 case 5:
                                     new_line("┏","━","┓",80);
                                     cout << "┃ - Objetivo: Exploda todos os inimigos da fase, após isso, o portal para a      ┃\n";
-                                    cout << "┃    próxima fase será aberta. São 3 fases ao total, com a última fase tendo     ┃\n";
-                                    cout << "┃    um Chefão te esperando...                                                   ┃\n";
+                                    cout << "┃   próxima fase será aberta. São 3 fases ao total, com a última fase tendo      ┃\n";
+                                    cout << "┃   um Chefão te esperando.                                                      ┃\n";
                                     cout << "┃ - Você começa apenas com uma vida, colete Vidas Extras para, bem, não morrer   ┃\n";
-                                    cout << "┃    quando levar dano.                                                          ┃\n";
+                                    cout << "┃   quando levar dano.                                                           ┃\n";
                                     cout << "┃ - Você pode só pode colocar um explosivo por vez, colete Multi-Detonares para  ┃\n";
-                                    cout << "┃    poder colocar mais explosivos.                                              ┃\n";
-                                    cout << "┃ - A explosão das bombas normais e C4 tem um formato de cruz (+), com um        ┃\n";
-                                    cout << "┃    alcançe de 1x1.                                                             ┃\n";
+                                    cout << "┃   poder colocar mais explosivos.                                               ┃\n";
                                     cout << "┃ - Ao colocar uma explosivo, não dá para passar por ela.                        ┃\n";
-                                    cout << "┃ - As bombas conseguem destruir paredes frageis, mas não as resistentes.        ┃\n";
-                                    cout << "┃ - Pontuação: Você começa o jogo com 0 pontos.                                  ┃\n";
-                                    cout << "┃ -- Matar um inimigo = + 250 pontos.                                            ┃\n";
-                                    cout << "┃ -- Levar dano = -250 pontos.                                                   ┃\n";
-                                    cout << "┃ -- Colocar uma bomba = - 10 pontos.                                            ┃\n";
-                                    cout << "┃ - Na última fase:                                                              ┃\n";
-                                    cout << "┃ -- Causar dano ao Chefão = + 500 pontos.                                       ┃\n";
-                                    cout << "┃ -- Se os 2 players estiverem vivo = + 250 pontos (para ambos).                 ┃\n";
+                                    cout << "┃ - As bombas conseguem destruir paredes frageis, mas não as solidas.            ┃\n";
+                                    cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━PONTUAÇÂO━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
+                                    cout << "┃ - O Jogador começa o jogo com 0 pontos.                                        ┃\n";
+                                    cout << "┃ - Matar um inimigo = +250 pontos.                                              ┃\n";
+                                    cout << "┃      Combo começa em 1                                                         ┃\n";
+                                    cout << "┃      Matar mais de um inimigo ao mesmo tempo aumenta o combo em 0.33...        ┃\n";
+                                    cout << "┃      A pontuação é multiplicada pelo combo para cada inimigo morto             ┃\n";
+                                    cout << "┃      Calculo aproximado: (250*1)+(250*1,33..)+(250*1,66..)+(250*2)...          ┃\n";
+                                    cout << "┃ - Perder Vida = -250 pontos.                                                   ┃\n";
+                                    cout << "┃ - Colocar uma bomba = -10 pontos.                                              ┃\n";
+                                    cout << "┃ - Causar dano ao Chefão = +500 pontos.                                         ┃\n";
+                                    cout << "┃      Se 2 players estiverem vivos = +250 pontos (para ambos).                  ┃\n";
                                     new_line("┗","━","┛",80);
                                     getch();
                                     cout << "\ec";
@@ -2071,9 +2092,9 @@ int main(){
                                             paginaVertical = 1;
                                         }
                                         if (paginaHorizontal < 1) {
-                                            paginaHorizontal = 3;
+                                            paginaHorizontal = 2;
                                         }
-                                        if (paginaHorizontal > 3) {
+                                        if (paginaHorizontal > 2) {
                                             paginaHorizontal = 1;
                                         }
                                         cout << "\e[?25l\e[H";
@@ -2082,7 +2103,7 @@ int main(){
                                         new_line("┣","━","┫",26);
                                         if (paginaVertical == 1) {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃  \e[93m[Página 1 - PASSIVOS] \e[0m┃\n";
+                                                cout << "┃  \e[93m[Página 1 - PASSIVOS]   \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
                                                 cout << "┃  \e[93m[Página 2 - ATIVOS]     \e[0m┃\n";
@@ -2090,7 +2111,7 @@ int main(){
                                             cout << "┃                          ┃\n";
                                         } else {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃ [Página 1 - PASSIVOS]  ┃\n";
+                                                cout << "┃ [Página 1 - PASSIVOS]    ┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
                                                 cout << "┃ [Página 2 - ATIVOS]      ┃\n";
@@ -2107,45 +2128,35 @@ int main(){
                                         switch (paginaHorizontal) {
                                             case 1:
                                                     new_line("┏","━","┓",109);
-                                                    cout << "┃                                      PÁGINA 1 - PASSIVOS                                                  ┃\n";
+                                                    cout << "┃                                      PÁGINA 1 - PASSIVOS                                                    ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Polvora (▲): Aumenta o raio de explosão do próximo explosivo em 3 células, em todas as direções. É        ┃\n";
-                                                    cout << "┃    consumido ao ser usado.                                                                                  ┃\n";
+                                                    cout << "┃ - Bombas (◉): Mostra quantas bombas o jogador pode colocar ao mesmo tempo                                   ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Multi-detonador (⧱): Permite colocar uma segunda bomba padrão em seguida. É consumida ao ser usada.       ┃\n";
+                                                    cout << "┃ - Polvoras (◈): Mostra qual o raio da explosão                                                              ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Vida Extra (☤): (Tecnicamente, é um Auto-Desfibrilador) ao levar dano, você revive e fica invulnerável    ┃\n";
-                                                    cout << "┃   por um curto período de tempo                                                                             ┃\n";                                                                                            \
+                                                    cout << "┃ - Vidas (☤): Mostra a quantidade de vidas que o jogador tem                                                 ┃\n";
+                                                    cout << "┃      Ao perder uma vida o jogador fica invencivel por 3 segundos.                                           ┃\n";
+                                                    cout << "┃      E Todas as outras passivas são perdidas e resetadas para 1.                                            ┃\n";
                                                     new_line("┗","━","┛",109);
                                             break;
 
                                             case 2:
                                                     new_line("┏","━","┓",109);
-                                                    cout << "┃                                      PÁGINA 2 - ATIVOS                                                    ┃\n";
+                                                    cout << "┃                                      PÁGINA 2 - ATIVOS                                                      ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - 'Espectro' (⬘): Um traje experimental que permite o jogador atravesar paredes frágies   ┃\n";
-                                                    cout << "┃   por 60 segundos. Após esse tempo, o traje se quebra. Não é possível aumentar o tempo do contador.         ┃\n";
+                                                    cout << "┃ - Espectro (⬘): Um traje experimental que permite o jogador atravesar paredes frágeis                       ┃\n";
+                                                    cout << "┃    a cada uso em uma parede fragil o traje tem 10% de quebrar.                                              ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - 'Crono-Hourglass' (⧗): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de     ┃\n";
+                                                    cout << "┃ - Crono-Hourglass (⧗): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de                 ┃\n";
                                                     cout << "┃   um inimigo.                                                                                               ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - 'C4' (▣): Um explosivo que pode ser detonado remotamente (sem time de detonação), uma caixa de C4 concede   ┃\n";
-                                                    cout << "┃    2 unidades, e podem ser implantadas ao mesmo tempo. Pressionar (R) vai detonar as C4. O raio de          ┃\n";
-                                                    cout << "┃    explosão é igual da bomba padrão.                                                                        ┃\n";
+                                                    cout << "┃ - Claymore (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
+                                                    cout << "┃   cima dela.                                                                                                ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - 'Claymore' (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
-                                                    cout << "┃   cima dela. A explosão afeta apenas a célula onde foi implantada. Um pacote de Claymores concede 2         ┃\n";
-                                                    cout << "┃   unidades.                                                                                                 ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - 'ÔM3GA' (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá    ┃\n";
+                                                    cout << "┃ - ÔM3GA (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá                      ┃\n";
                                                     cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
-                                                    cout << "┃   fragéis, inimigos, jogadores. Nada para ela.                                                              ┃\n";
+                                                    cout << "┃   fragéis, inimigos, jogadores.                                                                             ┃\n";
                                                     new_line("┗","━","┛",109);
-                                            break;
-
-                                            case 3:
-                                                cout << "\ec";
-                                                paginaHorizontal = 1;
                                             break;
                                         }
                                         key = getch();
