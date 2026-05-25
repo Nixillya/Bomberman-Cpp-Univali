@@ -2082,29 +2082,23 @@ int main(){
                                         new_line("┣","━","┫",26);
                                         if (paginaVertical == 1) {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃\e[93m  [Página 1 - Explosivos] \e[0m┃\n";
+                                                cout << "┃  \e[93m[Página 1 - PASSIVOS] \e[0m┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
-                                                cout << "┃\e[93m  [Página 2 - Trajes]     \e[0m┃\n";
-                                            }
-                                            if (paginaHorizontal == 3) {
-                                                cout << "┃\e[93m  [Página 3 - Passivos]   \e[0m┃\n";
+                                                cout << "┃  \e[93m[Página 2 - ATIVOS]     \e[0m┃\n";
                                             }
                                             cout << "┃                          ┃\n";
                                         } else {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃ [Página 1 - Explosivos]  ┃\n";
+                                                cout << "┃ [Página 1 - PASSIVOS]  ┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
-                                                cout << "┃ [Página 2 - Trajes]      ┃\n";
-                                            }
-                                            if (paginaHorizontal == 3) {
-                                                cout << "┃ [Página 3 - Passivos]    ┃\n";
+                                                cout << "┃ [Página 2 - ATIVOS]      ┃\n";
                                             }
                                             cout << "┃                          ┃\n";
                                         }
                                         if (paginaVertical == 2) {
-                                            cout << "┃\e[93m  [Voltar]                \e[0m┃\n";
+                                            cout << "┃  \e[93m[Voltar]                \e[0m┃\n";
                                         } else {
                                             cout << "┃ [Voltar]                 ┃\n";
                                         }
@@ -2113,36 +2107,7 @@ int main(){
                                         switch (paginaHorizontal) {
                                             case 1:
                                                     new_line("┏","━","┓",109);
-                                                    cout << "┃                                      PÁGINA 1 - EXPLOSIVOS                                                  ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - Bomba padrão (◉): A bomba padrão é o seu explosivo básico, tem uma quantidade infinita no seu inventário. ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - C4 (▣): Um explosivo que pode ser detonado remotamente (sem time de detonação), uma caixa de C4 concede   ┃\n";
-                                                    cout << "┃    2 unidades, e podem ser implantadas ao mesmo tempo. Pressionar (R) vai detonar as C4. O raio de          ┃\n";
-                                                    cout << "┃    explosão é igual da bomba padrão.                                                                        ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - Claymore (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
-                                                    cout << "┃   cima dela. A explosão afeta apenas a célula onde foi implantada. Um pacote de Claymores concede 2         ┃\n";
-                                                    cout << "┃   unidades.                                                                                                 ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - Protótipo Bomba 'ÔM3GA' (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá    ┃\n";
-                                                    cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
-                                                    cout << "┃   fragéis, inimigos, jogadores. Nada para ela.                                                              ┃\n";
-                                                    new_line("┗","━","┛",109);
-                                            break;
-
-                                            case 2:
-                                                    new_line("┏","━","┓",109);
-                                                    cout << "┃                                      PÁGINA 2 - TRAJES                                                      ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - Prótitpo de traje 'Espectro' (⬘): Um traje experimental que permite o jogador atravesar paredes frágies   ┃\n";
-                                                    cout << "┃   por 60 segundos. Após esse tempo, o traje se quebra. Não é possível aumentar o tempo do contador.         ┃\n";
-                                                    new_line("┗","━","┛",109);
-                                            break;
-
-                                            case 3:
-                                                    new_line("┏","━","┓",109);
-                                                    cout << "┃                                      PÁGINA 3 - PASSIVOS                                                    ┃\n";
+                                                    cout << "┃                                      PÁGINA 1 - PASSIVOS                                                  ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - Polvora (▲): Aumenta o raio de explosão do próximo explosivo em 3 células, em todas as direções. É        ┃\n";
                                                     cout << "┃    consumido ao ser usado.                                                                                  ┃\n";
@@ -2150,19 +2115,41 @@ int main(){
                                                     cout << "┃ - Multi-detonador (⧱): Permite colocar uma segunda bomba padrão em seguida. É consumida ao ser usada.       ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - Vida Extra (☤): (Tecnicamente, é um Auto-Desfibrilador) ao levar dano, você revive e fica invulnerável    ┃\n";
-                                                    cout << "┃   por um curto período de tempo                                                                             ┃\n";
-                                                    new_line("┣","━","┫",109);
-                                                    cout << "┃ - Prótotipo 'Crono-Hourglass' (⧗): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de     ┃\n";
-                                                    cout << "┃   um inimigo.                                                                                               ┃\n";                                                                                            \
+                                                    cout << "┃   por um curto período de tempo                                                                             ┃\n";                                                                                            \
                                                     new_line("┗","━","┛",109);
                                             break;
 
-                                            case 4:
+                                            case 2:
+                                                    new_line("┏","━","┓",109);
+                                                    cout << "┃                                      PÁGINA 2 - ATIVOS                                                    ┃\n";
+                                                    new_line("┣","━","┫",109);
+                                                    cout << "┃ - 'Espectro' (⬘): Um traje experimental que permite o jogador atravesar paredes frágies   ┃\n";
+                                                    cout << "┃   por 60 segundos. Após esse tempo, o traje se quebra. Não é possível aumentar o tempo do contador.         ┃\n";
+                                                    new_line("┣","━","┫",109);
+                                                    cout << "┃ - 'Crono-Hourglass' (⧗): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de     ┃\n";
+                                                    cout << "┃   um inimigo.                                                                                               ┃\n";
+                                                    new_line("┣","━","┫",109);
+                                                    cout << "┃ - 'C4' (▣): Um explosivo que pode ser detonado remotamente (sem time de detonação), uma caixa de C4 concede   ┃\n";
+                                                    cout << "┃    2 unidades, e podem ser implantadas ao mesmo tempo. Pressionar (R) vai detonar as C4. O raio de          ┃\n";
+                                                    cout << "┃    explosão é igual da bomba padrão.                                                                        ┃\n";
+                                                    new_line("┣","━","┫",109);
+                                                    cout << "┃ - 'Claymore' (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
+                                                    cout << "┃   cima dela. A explosão afeta apenas a célula onde foi implantada. Um pacote de Claymores concede 2         ┃\n";
+                                                    cout << "┃   unidades.                                                                                                 ┃\n";
+                                                    new_line("┣","━","┫",109);
+                                                    cout << "┃ - 'ÔM3GA' (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá    ┃\n";
+                                                    cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
+                                                    cout << "┃   fragéis, inimigos, jogadores. Nada para ela.                                                              ┃\n";
+                                                    new_line("┗","━","┛",109);
+                                            break;
+
+                                            case 3:
                                                 cout << "\ec";
                                                 paginaHorizontal = 1;
                                             break;
                                         }
                                         key = getch();
+                                        MovendoPeloMenuSD.play();
                                         switch (key) {
                                             case 119: // Cima
                                                 paginaVertical--;
