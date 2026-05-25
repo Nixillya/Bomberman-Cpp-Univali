@@ -44,13 +44,12 @@ Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho d
     ✅ - Deve-se ter um portal para a próxima Fase
     ✅ - O Jogo deve ter a opção de um segundo Jogador 
     ✅ - Parâmetro Default e Sobrecarga.
+    ✅ - Ter opção explicando a pontuação
     ✅ - Recursividade.
     ✅ - Struct
     ✅ - No último nível deve ter um boss
     ✅ - Template
-
-    ❌ - Ter opção explicando a pontuação
-    ❌ - Ter opção mostrando o Rank Ordenado
-    ❌ - O Jogo ser salvado em um arquivo
-    ❌ - Colocar música no jogo
-    ❌ - Criar arquivo, manipular: ler, inserir e dados
+    ✅ - O Jogo ser salvado em um arquivo
+    ✅ - Criar arquivo, manipular: ler, inserir e dados
+    ✅ - Ter opção mostrando o Rank Ordenado
+    ✅ - Colocar música no jogo
