@@ -1953,6 +1953,11 @@ int main(){
                                     break;
                                     case 13:
                                         kill = true;
+                                        if(deadMenu==2){
+                                            fstream file("Scores.txt");
+
+                                            file.close();
+                                        }
                                         if(deadMenu==3){
                                             success = false;
                                         }
