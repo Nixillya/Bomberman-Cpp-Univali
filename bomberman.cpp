@@ -202,6 +202,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
     if(player1.Item==3){
         cout<<"[Ω]";
     }
+    if(player1.Item==4){
+        cout<<"[ᛰ]";
+    }
     cout<<"\e[0m";
 
     if(info.players==3){
@@ -284,6 +287,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         if(player2.Item==3){
             cout<<"[Ω]";
         }
+        if(player2.Item==4){
+            cout<<"[ᛰ]";
+        }
         cout<<"\e[0m";
     }
     cout << "\e["<<mapSizeY+4<<";2H";
@@ -359,17 +365,55 @@ bool explode(int map[mapSizeY][mapSizeX], BombType bomb, int y, int x,int i=0){
     }
 }
 
-int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, PlayerType &player, int map[mapSizeY][mapSizeX], BombType explosions[], int enemysQuantity, EnemyType enemys[]){
+bool explode_pandora(int map[mapSizeY][mapSizeX], BombType bomb, PlayerType player1, PlayerType player2, EnemyType enemys[], int enemysQuantity, BossType boss){
+    while(true){
+        int y;
+        int x;
+        bool success = true;
+        while(true){
+            y = rand()%3 - 1;
+            x = rand()%3 - 1;
+            if(y==0 || x==0){
+                if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == freeBlock || map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock || map[bomb.Pos.Y+y][bomb.Pos.X+x] == explosionBlock){
+                    break;
+                }
+            }
+        }
+        if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock){
+            success = false;
+        }
+        if(bomb.Pos.Y+y == player1.Pos.Y && bomb.Pos.X+x == player1.Pos.X){
+            success = false;
+        }
+        if(bomb.Pos.Y+y == player2.Pos.Y && bomb.Pos.X+x == player2.Pos.X){
+            success = false;
+        }
+        if(success){
+            map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
+        }else{
+            map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
+            return false;
+        }
+        bomb.Pos.Y += y;
+        bomb.Pos.X += x;
+    }
+}
+
+int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, PlayerType &player,PlayerType &otherPlayer, int map[mapSizeY][mapSizeX], BombType explosions[], int enemysQuantity, EnemyType enemys[]){
     int sound = 0;
     if (map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] == freeBlock){
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = bombBlock;
     }
     if (bombs[bomb].Pos.Y > 0 && bombs[bomb].Pos.X > 0 && ((clock() - bombs[bomb].Time) >= 1000)){
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = explosionBlock;
-        explode(map, bombs[bomb], 1, 0);
-        explode(map, bombs[bomb], 0, 1);
-        explode(map, bombs[bomb], -1, 0);
-        explode(map, bombs[bomb], 0, -1);
+        if(bombs[bomb].Range==2000){
+            explode_pandora(map,bombs[bomb],player,otherPlayer,enemys,enemysQuantity,boss);
+        }else{
+            explode(map, bombs[bomb], 1, 0);
+            explode(map, bombs[bomb], 0, 1);
+            explode(map, bombs[bomb], -1, 0);
+            explode(map, bombs[bomb], 0, -1);
+        }
         explosions[bomb] = bombs[bomb];
         bombs[bomb].Pos.Y = -1;
         bombs[bomb].Pos.X = -1;
@@ -408,7 +452,7 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
 
 void lost_life(PlayerType &player, int &moveEnemy, int &timerClock){
     player.Lifes--;
-    if(player.Slot==3){
+    if(player.Slot!=4){
         player.Slot = 0;
     }
     if (player.Lifes >= 1){
@@ -463,7 +507,7 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                 sound = 2;
                 boxs[box].Pos.Y = -1;
                 boxs[box].Pos.X = -1;
-                if (rand() % 2 != 0 || player.Item != 0){
+                if (rand()%4!=0){
                     int item = rand() % 3;
                     if (item == 0){
                         player.MaxBombs++;
@@ -480,7 +524,7 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                 }else{
                     bool success = false;
                     while (!success){
-                        int item = rand() % 3 + 1;
+                        int item = rand() % 4 + 1;
                         player.Slot = 4;
                         player.Item = item;
                         if(player.Item == 2){
@@ -525,7 +569,17 @@ void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &tar
         bombs[player.ActualBomb].Range = player.MaxRange;
         if(player.Item == 3){
             player.Item = 0;
+            if(player.Slot==4){
+                player.Slot = 0;
+            }
             bombs[player.ActualBomb].Range = 1000;
+        }
+        if(player.Item == 4){
+            player.Item = 0;
+            if(player.Slot==4){
+                player.Slot = 0;
+            }
+            bombs[player.ActualBomb].Range = 2000;
         }
         bombs[player.ActualBomb].Pos.Y = player.Pos.Y;
         bombs[player.ActualBomb].Pos.X = player.Pos.X;
@@ -1684,10 +1738,10 @@ int game(InfoType &info){
         sound2 = 0;
         for(int bomb=0;bomb<maximumBombs;bomb++){
             if(sound1==0){
-                sound1 = bombs_explosion(info,boss,bombs1, bomb, player1, map, explosions1, enemysQuantity, enemys);
+                sound1 = bombs_explosion(info,boss,bombs1, bomb, player1, player2, map, explosions1, enemysQuantity, enemys);
             }
             if(sound2==0){
-                sound2 = bombs_explosion(info,boss,bombs2, bomb, player2, map, explosions2, enemysQuantity, enemys);
+                sound2 = bombs_explosion(info,boss,bombs2, bomb, player2, player1, map, explosions2, enemysQuantity, enemys);
             }
         }
         if(sound1 == 1 || sound2 == 1){
@@ -2199,10 +2253,13 @@ int main(){
                                                     cout << "┃ - Espectro (⬘): Um traje experimental que permite o jogador atravesar paredes frágeis                       ┃\n";
                                                     cout << "┃    a cada uso em uma parede fragil o traje tem 10% de quebrar.                                              ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Crono-Hourglass (⧗): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de                 ┃\n";
+                                                    cout << "┃ - Crono-Hourglass (◊): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de                 ┃\n";
                                                     cout << "┃   um inimigo.                                                                                               ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - Claymore (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
+                                                    cout << "┃   cima dela.                                                                                                ┃\n";
+                                                    new_line("┣","━","┫",109);
+                                                    cout << "┃ - Aegis (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
                                                     cout << "┃   cima dela.                                                                                                ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - ÔM3GA (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá                      ┃\n";
