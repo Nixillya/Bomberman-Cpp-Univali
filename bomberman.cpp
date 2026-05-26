@@ -483,6 +483,9 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                         int item = rand() % 3 + 1;
                         player.Slot = 4;
                         player.Item = item;
+                        if(player.Item == 2){
+                            sound = 4;
+                        }
                         success = true;
                     }
                 }
@@ -498,6 +501,15 @@ void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &tar
             if(rand()%10==0){
                 player.Item = 0;
                 player.Slot = 0;
+                for(int y=-1;y<=1;y++){
+                    for(int x=-1;x<=1;x++){
+                        if(y==0 || x==0){
+                            if(map[player.Pos.Y+y][player.Pos.X+x] == fragileBlock){
+                                map[player.Pos.Y+y][player.Pos.X+x] = freeBlock;
+                            }
+                        }
+                    }
+                }
             }
         }else{
             player.Pos.Y -= target.Pos.Y;
@@ -557,6 +569,12 @@ int game(InfoType &info){
     SoundBuffer morteInimigoBF;
     if(!morteInimigoBF.loadFromFile("Sounds/morte_inimigo.wav")){}
     Sound morteInimigoSD(morteInimigoBF);
+
+    SoundBuffer musicaBossBF;
+    if(!musicaBossBF.loadFromFile("Sounds/musica_boss.wav")){}
+    Sound musicaBossSD(musicaBossBF);
+    musicaBossSD.setLooping(true);
+    musicaBossSD.setVolume(50);
 
     SoundBuffer musicaFaseBF;
     if(!musicaFaseBF.loadFromFile("Sounds/musica_fase.wav")){}
@@ -633,6 +651,11 @@ int game(InfoType &info){
     int timerClock = clock();
 
     int map[mapSizeY][mapSizeX];
+
+    if(info.phase==3){
+        musicaFaseSD.stop();
+        musicaBossSD.play();
+    }
 
 //------------------------< VARIAVEIS GERAIS <------------------------//
 
@@ -1023,6 +1046,9 @@ int game(InfoType &info){
             pegandoLootSD.play();
         }
         if(sound1==3 || sound2==3){
+            ampulhetaSD.play();
+        }
+        if(sound1==4 || sound2==4){
             espectroSD.play();
         }
 
@@ -1714,7 +1740,8 @@ int main(){
     SoundBuffer musicaDerrotaBF;
     if(!musicaDerrotaBF.loadFromFile("Sounds/musica_derrota.wav")){}
     Sound musicaDerrotaSD(musicaDerrotaBF);
-    musicaDerrotaSD.setVolume(25);
+    musicaDerrotaSD.setVolume(50);
+    musicaDerrotaSD.setLooping(true);
 
     SoundBuffer musicaMenuBF;
     if(!musicaMenuBF.loadFromFile("Sounds/musica_menu.wav")){}
@@ -1726,7 +1753,8 @@ int main(){
     SoundBuffer musicaVitoriaBF;
     if(!musicaVitoriaBF.loadFromFile("Sounds/musica_vitoria.wav")){}
     Sound musicaVitoriaSD(musicaVitoriaBF);
-    musicaVitoriaSD.setVolume(25);
+    musicaVitoriaSD.setVolume(50);
+    musicaVitoriaSD.setLooping(true);
 
     bool running = true;
     int verticalMenu = 4;
