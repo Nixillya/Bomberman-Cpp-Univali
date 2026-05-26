@@ -23,6 +23,8 @@ Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho d
     ✅ - O jogador irá vencer se estiver vivo quando todos os inimigos tiverem morrido.
     ✅ - O jogador perde se morrer para um inimigo ou para a explosão da bomba.
 
+    NOTA: 10,00
+
 # M2
     ✅ - O Jogo deve estar otimizado.
     ✅ - O Jogo não deve piscar ou deslocar blocos sem a que seja da dinâmica do Jogo.
@@ -53,3 +55,10 @@ Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho d
     ✅ - Criar arquivo, manipular: ler, inserir e dados
     ✅ - Ter opção mostrando o Rank Ordenado
     ✅ - Colocar música no jogo
+
+    NOTA: ???
+
+# M3
+    ???
+
+    NOTA: ???

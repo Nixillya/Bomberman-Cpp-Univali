@@ -68,6 +68,7 @@ struct TimerType{
 };
 
 struct InfoType{
+    string name;
     int difficulty = 2;
     int players = 2;
     int phase = 1;
@@ -1402,10 +1403,10 @@ int game(InfoType &info){
                     player_action(player1,player2,target1,bombs1,map,putBomb);
                 }
             }
-            if(key==72 || key==80 || key==75 || key==77 || key==48){
+            if(key==72 || key==80 || key==75 || key==77 || key==13){
                 if(player2.Alive){
                     int putBomb = false;
-                    if(key==48 && (map[player2.Pos.Y][player2.Pos.X] == freeBlock) && player2.Invincible == 0 && (bombs2[player2.ActualBomb].Pos.Y == -1 && bombs2[player2.ActualBomb].Pos.X == -1)){
+                    if(key==13 && (map[player2.Pos.Y][player2.Pos.X] == freeBlock) && player2.Invincible == 0 && (bombs2[player2.ActualBomb].Pos.Y == -1 && bombs2[player2.ActualBomb].Pos.X == -1)){
                         if(count_bombs(bombs2, maximumBombs) < player2.MaxBombs){
                             putBomb = true;
                         }
@@ -1863,6 +1864,9 @@ int main(){
                     bool success = false;
                     int gameMenu = 1;
                     InfoType info;
+                    cout << "\e[9;1H";
+                    cout << " \e[93mNome:\e[0m ";
+                    cin>>info.name;
                     while(true){
                         bool kill = false;
                         cout << "\e[?25l\e[1;18H";
@@ -1993,7 +1997,7 @@ int main(){
                                 if(info.players>=2){
                                     fstream file;
                                     file.open("Scores.txt", ios::app);
-                                    file<<info.maxPoints<<"\n";
+                                    file<<info.name<<","<<info.maxPoints<<"\n";
                                     file.close();
                                 }
                             }
@@ -2142,7 +2146,7 @@ int main(){
                             switch(codex){
                                 case 4:
                                     new_line("┏","━","┓",46);
-                                    cout << "┃ Controles                                    ┃\n";
+                                    cout << "┃ Controles Jogador 1: WASD                    ┃\n";
                                     cout << "┃                                              ┃\n";
                                     cout << "┃                Cima                          ┃\n";
                                     cout << "┃                 ^                            ┃\n";
@@ -2153,6 +2157,18 @@ int main(){
                                     cout << "┃                                              ┃\n";
                                     new_line("┣","━","┫",46);
                                     cout << "┃ ( Espace ) -> Colocar explosivo              ┃\n";
+                                    new_line("┗","━","┛",46);
+                                    new_line("┏","━","┓",46);
+                                    cout << "┃ Controles Jogador 2: Setas                   ┃\n";
+                                    cout << "┃                                              ┃\n";
+                                    cout << "┃                Cima                          ┃\n";
+                                    cout << "┃                 ^                            ┃\n";
+                                    cout << "┃      Esquerda <   > Direita                  ┃\n";
+                                    cout << "┃                 V                            ┃\n";
+                                    cout << "┃               Baixo                          ┃\n";
+                                    cout << "┃                                              ┃\n";
+                                    new_line("┣","━","┫",46);
+                                    cout << "┃ ( 0 ) -> Colocar explosivo                   ┃\n";
                                     new_line("┗","━","┛",46);
                                     getch();
                                     cout << "\ec";
@@ -2170,7 +2186,7 @@ int main(){
                                     cout << "┃ - Ao colocar uma explosivo, não dá para passar por ela.                        ┃\n";
                                     cout << "┃ - As bombas conseguem destruir paredes frageis, mas não as solidas.            ┃\n";
                                     cout << "┃                                                                                ┃\n";
-                                    cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━PONTUAÇÂO━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
+                                    cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ PONTUAÇÂO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
                                     cout << "┃                                                                                ┃\n";
                                     cout << "┃ - O Jogador começa o jogo com 1000 pontos.                                     ┃\n";
                                     cout << "┃ - O Jogador perde 1 ponto por segundo.                                         ┃\n";
@@ -2179,10 +2195,10 @@ int main(){
                                     cout << "┃      Matar mais de um inimigo ao mesmo tempo aumenta o combo em 0.33...        ┃\n";
                                     cout << "┃      A pontuação é multiplicada pelo combo para cada inimigo morto             ┃\n";
                                     cout << "┃      Calculo aproximado: (250*1)+(250*1,33..)+(250*1,66..)+(250*2)...          ┃\n";
-                                    cout << "┃ - Perder Vida = -250 pontos.                                                   ┃\n";
-                                    cout << "┃ - Colocar uma bomba = -10 pontos.                                              ┃\n";
                                     cout << "┃ - Causar dano ao Chefão = +500 pontos.                                         ┃\n";
                                     cout << "┃      Se 2 players estiverem vivos = +250 pontos (para ambos).                  ┃\n";
+                                    cout << "┃ - Perder Vida = -250 pontos.                                                   ┃\n";
+                                    cout << "┃ - Colocar uma bomba = -10 pontos.                                              ┃\n";
                                     new_line("┗","━","┛",80);
                                     getch();
                                     cout << "\ec";
