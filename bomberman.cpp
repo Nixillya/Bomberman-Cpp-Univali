@@ -99,6 +99,70 @@ int swaper(number x){
     return i;
 }
 
+void mostrar_pontos(){
+    int i = 1;
+    int j = 1;
+    int pointsMax = 0;
+    string ignore;
+    ifstream file("Scores.txt");
+
+    // Conta quantos pontos tem no arquivo para definir o tamanho dos arrays
+    while(!file.eof()){
+        file>>ignore;
+        pointsMax++;
+    }
+    file.close();
+
+    // divide o total de pontos por 2, pois cada ponto tem um nome e um valor
+    pointsMax/=2;
+    pointsMax++;
+    
+
+    string nomes[pointsMax];
+    int pontos[pointsMax];
+
+    // Lê o arquivo novamente, mas dessa vez armazena os pontos e os nomes em arrays para depois ordenar e mostrar na tela
+    file.open("Scores.txt");
+    while(!file.eof()){
+        if(i%2==0){
+            file>>pontos[j];
+            j++;
+        }else{
+            file>>nomes[j];
+        }
+        i++;
+    }
+    file.close();
+
+    // Ordena os pontos e os nomes, ele procura o maior ponto e coloca na posição correta, depois repete o processo para o próximo ponto até ordenar todoss os pontos
+    int idAlto = 1;
+    for(int id=1; id<pointsMax; id++){
+        int maiorPonto = 0;
+        for(int i=id; i<pointsMax; i++){
+            if(pontos[i]>maiorPonto){
+                maiorPonto = pontos[i];
+                idAlto = i;
+            }
+        }
+        if(idAlto<pointsMax){
+            int auxPonto = pontos[idAlto];
+            string auxNome = nomes[idAlto];
+            pontos[idAlto] = pontos[id];
+            nomes[idAlto] = nomes[id];
+            pontos[id] = auxPonto;
+            nomes[id] = auxNome;
+        }
+    }
+    cout<<"\e[10;1H";
+    cout<<"\nPontuações:"<<endl<<endl;
+    if(pointsMax==1){
+        cout<<"    Nenhuma pontuação registrada"<<endl;
+    }
+    for(int i=1; i<pointsMax; i++){
+        cout<<"    "<<i<<" - "<<nomes[i]<<"  "<<pontos[i]<<endl;
+    }
+}
+
 void new_line(string x, string y, string z,int size){
     cout<<x;
     for(int i = 0; i<size; i++){
@@ -954,8 +1018,10 @@ int game(InfoType &info){
                             if(map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X]==explosionBlock) { // Testa se naquela posição tem um bloco de explosão
                                 if(freezeEnemys==0){
                                     cout << "\e[31;43m\u25A1"; // INIMIGO MORTO NA EXPLOSÃO
+                                    break;
                                 }else{
                                     cout << "\e[31;43m\e[38;5;52m\u25A1"; // INIMIGO MORTO NA EXPLOSÃO CONGELADO
+                                    break;
                                 }
                             }else{
                                 if((player1.Pos.Y==enemys[enemy].Pos.Y && player1.Pos.X==enemys[enemy].Pos.X) || (player2.Pos.Y==enemys[enemy].Pos.Y && player2.Pos.X==enemys[enemy].Pos.X)) {
@@ -1865,7 +1931,7 @@ int main(){
                     int gameMenu = 1;
                     InfoType info;
                     cout << "\e[9;1H";
-                    cout << " \e[93mNome:\e[0m ";
+                    cout << " Nome: ";
                     cin>>info.name;
                     while(true){
                         bool kill = false;
@@ -1997,7 +2063,8 @@ int main(){
                                 if(info.players>=2){
                                     fstream file;
                                     file.open("Scores.txt", ios::app);
-                                    file<<info.name<<","<<info.maxPoints<<"\n";
+                                    file<<info.name<<"\n";
+                                    file<<info.maxPoints<<"\n";
                                     file.close();
                                 }
                             }
@@ -2168,7 +2235,7 @@ int main(){
                                     cout << "┃               Baixo                          ┃\n";
                                     cout << "┃                                              ┃\n";
                                     new_line("┣","━","┫",46);
-                                    cout << "┃ ( 0 ) -> Colocar explosivo                   ┃\n";
+                                    cout << "┃ ( Enter ) -> Colocar explosivo               ┃\n";
                                     new_line("┗","━","┛",46);
                                     getch();
                                     cout << "\ec";
@@ -2225,10 +2292,10 @@ int main(){
                                         new_line("┣","━","┫",26);
                                         if (paginaVertical == 1) {
                                             if (paginaHorizontal == 1) {
-                                                cout << "┃  \e[93m[Página 1 - PASSIVOS]   \e[0m┃\n";
+                                                cout << "┃  \e[93m[Página 1 - PASSIVOS]\e[0m   ┃\n";
                                             }
                                             if (paginaHorizontal == 2) {
-                                                cout << "┃  \e[93m[Página 2 - ATIVOS]     \e[0m┃\n";
+                                                cout << "┃  \e[93m[Página 2 - ATIVOS]\e[0m     ┃\n";
                                             }
                                             cout << "┃                          ┃\n";
                                         } else {
@@ -2241,7 +2308,7 @@ int main(){
                                             cout << "┃                          ┃\n";
                                         }
                                         if (paginaVertical == 2) {
-                                            cout << "┃  \e[93m[Voltar]                \e[0m┃\n";
+                                            cout << "┃  \e[93m[Voltar]\e[0m                ┃\n";
                                         } else {
                                             cout << "┃ [Voltar]                 ┃\n";
                                         }
@@ -2316,11 +2383,9 @@ int main(){
                                 break;
 
                                 case 7:
-
-                                    cout << "\nTemplate de Rank.";
+                                    mostrar_pontos();
                                     getch();
                                     cout << "\ec";
-
                                 break;
 
                                 case 8:
