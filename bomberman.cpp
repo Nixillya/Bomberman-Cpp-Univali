@@ -117,7 +117,6 @@ void mostrar_pontos(){
     pointsMax/=2;
     pointsMax++;
     
-
     string nomes[pointsMax];
     int pontos[pointsMax];
 
