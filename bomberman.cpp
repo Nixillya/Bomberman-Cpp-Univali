@@ -57,7 +57,7 @@ struct PlayerType{
     int Slot = 0;
     int TotalMoves = 0;
     int Totalbombs = 0;
-    int Points = 0;
+    int Points = 1000;
     bool Alive = true;
 };
 
@@ -608,15 +608,21 @@ int game(InfoType &info){
     PositionType portal;
 
     PlayerType player1;
-    player1.Alive = info.player1.Alive;
-    player1.Points = info.player1.Points;
-    player1.Totalbombs = info.player1.Totalbombs;
-    player1.TotalMoves = info.player1.TotalMoves;
     PlayerType player2;
-    player2.Alive = info.player2.Alive;
-    player2.Points = info.player2.Points;
-    player2.Totalbombs = info.player2.Totalbombs;
-    player2.TotalMoves = info.player2.TotalMoves;
+    if(info.phase>1){
+        player1.Alive = info.player1.Alive;
+        player1.Points = info.player1.Points;
+        player1.Totalbombs = info.player1.Totalbombs;
+        player1.TotalMoves = info.player1.TotalMoves;
+        player2.Alive = info.player2.Alive;
+        player2.Points = info.player2.Points;
+        player2.Totalbombs = info.player2.Totalbombs;
+        player2.TotalMoves = info.player2.TotalMoves;
+    }
+
+    if(info.players==1 || info.players==2){
+        player2.Points = 0;
+    }
 
     int maximumBombs = 25;
     BombType bombs1[maximumBombs];
@@ -702,40 +708,6 @@ int game(InfoType &info){
             }
         }
     }
-    if(player1.Alive){
-        while(true){ // Gera a posição do jogador
-            bool success = false;
-            player1.Pos.Y = rand()%mapSizeY;
-            player1.Pos.X = rand()%mapSizeX;
-            if (map[player1.Pos.Y][player1.Pos.X] == freeBlock){ // Verifica se a posição do player1 é uma area livre, se for, ele faz uma verificação para não gerar o player1 perto de paredes frageis
-                success = true;
-                for (int y = -1; y < 2; y++){
-                    for (int x = -1; x < 2; x++){ // Passa por uma matriz 3x3 em volta do player1
-                        if(y==0 || x==0){ // Verifica se tem uma parede fragil em volta do player1, se tiver, ele gera outra posição
-                            if (map[player1.Pos.Y+y][player1.Pos.X+x] == fragileBlock){
-                                success = false;
-                            }
-                        }
-                    }
-                }
-                if(success){
-                    break;
-                }
-            }
-        }
-    }else{
-        player1.Pos.Y = -2;
-        player1.Pos.X = -2;
-        player1.Alive = false;
-    }
-    if(info.players==3 && player2.Alive){
-        player2.Pos.Y = player1.Pos.Y;
-        player2.Pos.X = player1.Pos.X;
-    }else{
-        player2.Pos.Y = -2;
-        player2.Pos.X = -2;
-        player2.Alive = false;
-    }
     for (int  i = 0; i < enemysQuantity; i++){ // Gera as posições dos enemys
         EnemyType enemy;   // Posição do inimigo
         if(info.phase!=3){
@@ -789,6 +761,45 @@ int game(InfoType &info){
                 }
             }
         }
+    }
+    if(player1.Alive){
+        while(true){ // Gera a posição do jogador
+            bool success = false;
+            player1.Pos.Y = rand()%mapSizeY;
+            player1.Pos.X = rand()%mapSizeX;
+            if (map[player1.Pos.Y][player1.Pos.X] == freeBlock){ // Verifica se a posição do player1 é uma area livre, se for, ele faz uma verificação para não gerar o player1 perto de paredes frageis
+                success = true;
+                for (int y = -1; y < 2; y++){
+                    for (int x = -1; x < 2; x++){ // Passa por uma matriz 3x3 em volta do player1
+                        if(y==0 || x==0){ // Verifica se tem uma parede fragil em volta do player1, se tiver, ele gera outra posição
+                            if (map[player1.Pos.Y+y][player1.Pos.X+x] == fragileBlock){
+                                success = false;
+                            }
+                            for(int enemy = 0; enemy < enemysQuantity; enemy++){
+                                if(player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X){
+                                    success = false;
+                                }
+                            }
+                        }
+                    }
+                }
+                if(success){
+                    break;
+                }
+            }
+        }
+    }else{
+        player1.Pos.Y = -2;
+        player1.Pos.X = -2;
+        player1.Alive = false;
+    }
+    if(info.players==3 && player2.Alive){
+        player2.Pos.Y = player1.Pos.Y;
+        player2.Pos.X = player1.Pos.X;
+    }else{
+        player2.Pos.Y = -2;
+        player2.Pos.X = -2;
+        player2.Alive = false;
     }
 //------------------------< GERAÇÃO DO MAPA <------------------------//
 
@@ -1695,10 +1706,15 @@ int game(InfoType &info){
 int main(){
     SetConsoleOutputCP(CP_UTF8);
 
-    SoundBuffer MovendoPeloMenuBF;
-    if(!MovendoPeloMenuBF.loadFromFile("Sounds/movendo_pelo_menu.wav")){}
-    Sound MovendoPeloMenuSD(MovendoPeloMenuBF);
-    MovendoPeloMenuSD.setVolume(25);
+    SoundBuffer movendoPeloMenuBF;
+    if(!movendoPeloMenuBF.loadFromFile("Sounds/movendo_pelo_menu.wav")){}
+    Sound movendoPeloMenuSD(movendoPeloMenuBF);
+    movendoPeloMenuSD.setVolume(25);
+
+    SoundBuffer musicaDerrotaBF;
+    if(!musicaDerrotaBF.loadFromFile("Sounds/musica_derrota.wav")){}
+    Sound musicaDerrotaSD(musicaDerrotaBF);
+    musicaDerrotaSD.setVolume(25);
 
     SoundBuffer musicaMenuBF;
     if(!musicaMenuBF.loadFromFile("Sounds/musica_menu.wav")){}
@@ -1706,6 +1722,11 @@ int main(){
     musicaMenuSD.setVolume(10);
     musicaMenuSD.setLooping(true);
     musicaMenuSD.play();
+
+    SoundBuffer musicaVitoriaBF;
+    if(!musicaVitoriaBF.loadFromFile("Sounds/musica_vitoria.wav")){}
+    Sound musicaVitoriaSD(musicaVitoriaBF);
+    musicaVitoriaSD.setVolume(25);
 
     bool running = true;
     int verticalMenu = 4;
@@ -1740,7 +1761,7 @@ int main(){
         }
         new_line("┗","━","┛",15);
         int key = getch();
-        MovendoPeloMenuSD.play();
+        movendoPeloMenuSD.play();
         switch(key){
             case 119: // Ir para cima
                 verticalMenu--;
@@ -1818,7 +1839,7 @@ int main(){
                         cout << "\e[6;18H";
                         new_line("┗","━","┛",24);
                         int key = getch();
-                        MovendoPeloMenuSD.play();
+                        movendoPeloMenuSD.play();
                         switch(key){
                             case 119: // Ir para cima
                                 gameMenu--;
@@ -1862,7 +1883,6 @@ int main(){
                             break;
                             case 13:
                                 if(gameMenu==3){
-                                    musicaMenuSD.stop();
                                     success = true;
                                 }
                             break;
@@ -1876,15 +1896,20 @@ int main(){
                         if(success)break;
                     }
                     while(success){
+                        musicaMenuSD.stop();
+                        musicaVitoriaSD.stop();
+                        musicaDerrotaSD.stop();
                         cout<<"\ec\e[?25l";
                         int deadMenu = -1;
                         if(game(info)){
                             if(info.phase>3){
+                                musicaVitoriaSD.play();
                                 cout<<"\e[12;"<<mapSizeX+3<<"H";
                                 cout << "┃ \e[38;5;46mVITORIA!\e[0m           ┃\n";
                                 deadMenu = 1;
                             }
                         }else{
+                            musicaDerrotaSD.play();
                             cout<<"\e[12;"<<mapSizeX+3<<"H";
                             cout << "┃ \e[38;5;9mDERROTA!\e[0m           ┃\n";
                             deadMenu = 1;
@@ -1931,7 +1956,7 @@ int main(){
                                 cout<<"\e[17;"<<mapSizeX+3<<"H";
                                 new_line("┗","━","┛",20);
                                 int key = getch();
-                                MovendoPeloMenuSD.play();
+                                movendoPeloMenuSD.play();
                                 switch(key){
                                     case 119: // Ir para cima
                                         deadMenu--;
@@ -1954,11 +1979,15 @@ int main(){
                                     case 13:
                                         kill = true;
                                         if(deadMenu==2){
-                                            fstream file("Scores.txt");
-
+                                            fstream file;
+                                            file.open("Scores.txt", ios::app);
+                                            file<<info.maxPoints<<"\n";
                                             file.close();
                                         }
-                                        if(deadMenu==3){
+                                        if(deadMenu==3 || deadMenu==2){
+                                            musicaVitoriaSD.stop();
+                                            musicaDerrotaSD.stop();
+                                            musicaMenuSD.play();
                                             success = false;
                                         }
                                         if(deadMenu==1 || deadMenu==3){
@@ -2031,7 +2060,7 @@ int main(){
                         new_line("┗","━","┛",15);
 
                         int key = getch();
-                        MovendoPeloMenuSD.play();
+                        movendoPeloMenuSD.play();
 
                         switch (key){
                         case 72: case 'w': case 'W': // Ir para cima
@@ -2072,7 +2101,8 @@ int main(){
                                     cout << "┃ - Ao colocar uma explosivo, não dá para passar por ela.                        ┃\n";
                                     cout << "┃ - As bombas conseguem destruir paredes frageis, mas não as solidas.            ┃\n";
                                     cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━PONTUAÇÂO━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
-                                    cout << "┃ - O Jogador começa o jogo com 0 pontos.                                        ┃\n";
+                                    cout << "┃ - O Jogador começa o jogo com 1000 pontos.                                     ┃\n";
+                                    cout << "┃ - O Jogador perde 1 ponto por segundo.                                         ┃\n";
                                     cout << "┃ - Matar um inimigo = +250 pontos.                                              ┃\n";
                                     cout << "┃      Combo começa em 1                                                         ┃\n";
                                     cout << "┃      Matar mais de um inimigo ao mesmo tempo aumenta o combo em 0.33...        ┃\n";
@@ -2165,7 +2195,7 @@ int main(){
                                             break;
                                         }
                                         key = getch();
-                                        MovendoPeloMenuSD.play();
+                                        movendoPeloMenuSD.play();
                                         switch (key) {
                                             case 119: // Cima
                                                 paginaVertical--;
