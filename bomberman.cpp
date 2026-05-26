@@ -1936,6 +1936,12 @@ int main(){
                                 cout<<"\e[12;"<<mapSizeX+3<<"H";
                                 cout << "┃ \e[38;5;46mVITORIA!\e[0m           ┃\n";
                                 deadMenu = 1;
+                                if(info.players>=2){
+                                    fstream file;
+                                    file.open("Scores.txt", ios::app);
+                                    file<<info.maxPoints<<"\n";
+                                    file.close();
+                                }
                             }
                         }else{
                             musicaDerrotaSD.play();
@@ -1967,17 +1973,9 @@ int main(){
                                     cout<<"┃ [REINICIAR]        ┃\n";
                                 }
                                 cout<<"\e[15;"<<mapSizeX+3<<"H";
-                                if(info.players==1){
-                                    cout<<"┃                    ┃\n";
-                                }else{
-                                    if(deadMenu==2){
-                                        cout<<"┃\e[93m  [SALVAR]          \e[0m┃\n";
-                                    }else{
-                                        cout<<"┃ [SALVAR]           ┃\n";
-                                    }
-                                }
+                                cout<<"┃                    ┃\n";
                                 cout<<"\e[16;"<<mapSizeX+3<<"H";   
-                                if(deadMenu==3){
+                                if(deadMenu==2){
                                     cout<<"┃\e[93m  [MENU]            \e[0m┃\n";
                                 }else{
                                     cout<<"┃ [MENU]             ┃\n";
@@ -1990,29 +1988,17 @@ int main(){
                                     case 119: // Ir para cima
                                         deadMenu--;
                                         if (deadMenu < 1) {
-                                            deadMenu = 3;
-                                        }
-                                        if(info.players==1 && deadMenu==2){
-                                            deadMenu = 1;
+                                            deadMenu = 2;
                                         }
                                     break;
                                     case 115: // Ir para baixo
                                         deadMenu++;
-                                        if (deadMenu > 3) {
+                                        if (deadMenu > 2) {
                                             deadMenu = 1;
-                                        }
-                                        if(info.players==1 && deadMenu==2){
-                                            deadMenu = 3;
                                         }
                                     break;
                                     case 13:
                                         kill = true;
-                                        if(deadMenu==2){
-                                            fstream file;
-                                            file.open("Scores.txt", ios::app);
-                                            file<<info.maxPoints<<"\n";
-                                            file.close();
-                                        }
                                         if(deadMenu==3 || deadMenu==2){
                                             musicaVitoriaSD.stop();
                                             musicaDerrotaSD.stop();
@@ -2129,7 +2115,9 @@ int main(){
                                     cout << "┃   poder colocar mais explosivos.                                               ┃\n";
                                     cout << "┃ - Ao colocar uma explosivo, não dá para passar por ela.                        ┃\n";
                                     cout << "┃ - As bombas conseguem destruir paredes frageis, mas não as solidas.            ┃\n";
+                                    cout << "┃                                                                                ┃\n";
                                     cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━PONTUAÇÂO━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
+                                    cout << "┃                                                                                ┃\n";
                                     cout << "┃ - O Jogador começa o jogo com 1000 pontos.                                     ┃\n";
                                     cout << "┃ - O Jogador perde 1 ponto por segundo.                                         ┃\n";
                                     cout << "┃ - Matar um inimigo = +250 pontos.                                              ┃\n";
