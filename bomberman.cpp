@@ -556,6 +556,7 @@ int game(InfoType &info){
     SoundBuffer ampulhetaBF;
     if(!ampulhetaBF.loadFromFile("Sounds/ampulheta.wav")){}
     Sound ampulhetaSD(ampulhetaBF);
+    ampulhetaSD.setVolume(50);
 
     SoundBuffer espectroBF;
     if(!espectroBF.loadFromFile("Sounds/espectro.wav")){}
