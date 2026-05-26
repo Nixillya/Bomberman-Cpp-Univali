@@ -1160,6 +1160,12 @@ int game(InfoType &info){
         sound2 = 0;
         sound1 = player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
         sound2 = player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+        if(!player1.Alive){
+            sound1 = 0;
+        }
+        if(!player2.Alive){
+            sound2 = 0;
+        }
         if(sound1==1 || sound2==1){
             perdeuVidaSD.play();
         }
