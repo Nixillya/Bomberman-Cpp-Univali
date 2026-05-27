@@ -287,7 +287,7 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         cout<<"[☖]";
     }
     if(player1.Item==6){
-        cout<<"[#]";
+        cout<<"[▧]";
     }
     cout<<"\e[0m";
     // <<< PLAYER1
@@ -383,7 +383,7 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
             cout<<"[☖]";
         }
         if(player2.Item==6){
-            cout<<"[#]";
+            cout<<"[▧]";
         }
         cout<<"\e[0m";
     }
@@ -490,11 +490,18 @@ bool explode_pandora(int map[mapSizeY][mapSizeX], BombType bomb, PlayerType play
         if(bomb.Pos.Y+y == player2.Pos.Y && bomb.Pos.X+x == player2.Pos.X){
             success = false;
         }
+        for(int enemy = 0; enemy < enemysQuantity; enemy++){
+            if(bomb.Pos.Y+y == enemys[enemy].Pos.Y && bomb.Pos.X+x == enemys[enemy].Pos.X){
+                success = false;
+            }
+        }
         if(success){
             map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
         }else{
             map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
-            return false;
+            if(rand()%4==0){
+                return false;
+            }
         }
         bomb.Pos.Y += y;
         bomb.Pos.X += x;
@@ -2536,18 +2543,20 @@ int main(){
                                                     cout << "┃ - Espectro (⬘): Um traje experimental que permite o jogador atravesar paredes frágeis                       ┃\n";
                                                     cout << "┃    a cada uso em uma parede fragil o traje tem 10% de quebrar.                                              ┃\n";
                                                     new_line("┣","━","┫",109);
+                                                    cout << "┃ - Parede (▧): Uma parede que pode ser colocada.                                                             ┃\n";
+                                                    new_line("┣","━","┫",109);
                                                     cout << "┃ - Crono-Hourglass (◊): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de                 ┃\n";
                                                     cout << "┃   um inimigo.                                                                                               ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Aegis (☖): Um escudo que protege o jogador de ataques inimigos e ao ser utilizado mata todos ao redor     ┃\n";
+                                                    cout << "┃ - Aegis (☖): Um escudo que protege o jogador de ataques inimigos e ao ser utilizado mata todos ao redor    ┃\n";
                                                     cout << "┃   porém dobra o dano recebido da bomba.                                                                     ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - ÔM3GA (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá                      ┃\n";
                                                     cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
                                                     cout << "┃   fragéis, inimigos, jogadores.                                                                             ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Pandora (ᛰ): Uma bomba na qual faz uma trajetoria aleatória, e vai parar apenas ao                        ┃\n";
-                                                    cout << "┃   acertar um jogador ou parede fragil podendo matar multiplos inimigos ao mesmo tempo.                      ┃\n";
+                                                    cout << "┃ - Pandora (ᛰ): Uma bomba na qual faz uma trajetoria aleatória, e tem 25% de chance de parar ao              ┃\n";
+                                                    cout << "┃   acertar um jogador ou parede fragil ou inimigo, podendo matar multiplos inimigos ao mesmo tempo.          ┃\n";
                                                     new_line("┗","━","┛",109);
                                             break;
                                         }
