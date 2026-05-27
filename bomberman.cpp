@@ -1284,6 +1284,74 @@ int game(InfoType &info){
                 }else{
                     priority = 2;
                 }
+                for(int y=-2;y<=2;y++){
+                    for(int x=-2;x<=2;x++){
+                        if((player1.Pos.Y+y>0 && player1.Pos.Y+y<mapSizeY && player1.Pos.X+x>0 && player1.Pos.X+x<mapSizeX)){
+                            if(((y>=-1||x>=-1) && (y<=1||x<=1)) || (y==0||x==0)){
+                                for(int enemy=0;enemy<enemysQuantity;enemy++){
+                                    if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
+                                        totalEnemys++;
+                                    }
+                                }
+                            }
+                            if(map[player1.Pos.Y][player1.Pos.X]==bombBlock){
+                                putBomb = false;
+                                if(y==-2 && x==0){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y+1;
+                                        int x1 = x-1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1;
+                                            int x2 = x1+2;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
+                                            }
+                                        }
+                                    }
+                                }
+                                if(y==0 && x==2){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y-1;
+                                        int x1 = x-1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1+2;
+                                            int x2 = x1;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
+                                            }
+                                        }
+                                    }
+                                }
+                                if(y==2 && x==0){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y-1;
+                                        int x1 = x+1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1;
+                                            int x2 = x1-2;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
+                                            }
+                                        }
+                                    }
+                                }
+                                if(y==0 && x==-2){
+                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
+                                        int y1 = y+1;
+                                        int x1 = x+1;
+                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
+                                            int y2 = y1-2;
+                                            int x2 = x1;
+                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
+                                                found_danger(danger,y,x);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 for(int y=-1;y<=1;y++){
                     for(int x=-1;x<=1;x++){
                         if((y==0||x==0)){
@@ -1368,74 +1436,6 @@ int game(InfoType &info){
                 }
                 if(portal.Pos.Y!=-1 && portal.Pos.X!=-1){
                     priority = 3;
-                }
-                for(int y=-2;y<=2;y++){
-                    for(int x=-2;x<=2;x++){
-                        if((player1.Pos.Y+y>0 && player1.Pos.Y+y<mapSizeY && player1.Pos.X+x>0 && player1.Pos.X+x<mapSizeX)){
-                            if(((y>=-1||x>=-1) && (y<=1||x<=1)) || (y==0||x==0)){
-                                for(int enemy=0;enemy<enemysQuantity;enemy++){
-                                    if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
-                                        totalEnemys++;
-                                    }
-                                }
-                            }
-                            if(map[player1.Pos.Y][player1.Pos.X]==bombBlock){
-                                putBomb = false;
-                                if(y==-2 && x==0){
-                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                        int y1 = y+1;
-                                        int x1 = x-1;
-                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                            int y2 = y1;
-                                            int x2 = x1+2;
-                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                found_danger(danger,y,x);
-                                            }
-                                        }
-                                    }
-                                }
-                                if(y==0 && x==2){
-                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                        int y1 = y-1;
-                                        int x1 = x-1;
-                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                            int y2 = y1+2;
-                                            int x2 = x1;
-                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                found_danger(danger,y,x);
-                                            }
-                                        }
-                                    }
-                                }
-                                if(y==2 && x==0){
-                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                        int y1 = y-1;
-                                        int x1 = x+1;
-                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                            int y2 = y1;
-                                            int x2 = x1-2;
-                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                found_danger(danger,y,x);
-                                            }
-                                        }
-                                    }
-                                }
-                                if(y==0 && x==-2){
-                                    if(map[player1.Pos.Y+y][player1.Pos.X+x]!=freeBlock){
-                                        int y1 = y+1;
-                                        int x1 = x+1;
-                                        if(map[player1.Pos.Y+y1][player1.Pos.X+x1]!=freeBlock){
-                                            int y2 = y1-2;
-                                            int x2 = x1;
-                                            if(map[player1.Pos.Y+y2][player1.Pos.X+x2]!=freeBlock){
-                                                found_danger(danger,y,x);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
                 int safes = 0;
                 for(int i=0;i<4;i++){
@@ -1580,12 +1580,18 @@ int game(InfoType &info){
                                         bool success = false;
                                         portal.Pos.Y = rand()%mapSizeY,
                                         portal.Pos.X = rand()%mapSizeX;
-                                        if(map[portal.Pos.Y][portal.Pos.X] == freeBlock){ // Verifica se a posição do player1 é uma area livre, se for, ele faz uma verificação para não gerar o player1 perto de paredes frageis
+                                        if(map[portal.Pos.Y][portal.Pos.X] == freeBlock){
                                             success = true;
                                             for(int box=0;box<fragileWallQuantity;box++){
                                                 if(portal.Pos.Y == boxs[box].Pos.Y && portal.Pos.X == boxs[box].Pos.X){
                                                     success = false;
                                                 }
+                                            }
+                                            if(portal.Pos.Y == player1.Pos.Y && portal.Pos.X == player1.Pos.X){
+                                                success = false;
+                                            }
+                                            if(portal.Pos.Y == player2.Pos.Y && portal.Pos.X == player2.Pos.X){
+                                                success = false;
                                             }
                                             if(success){
                                                 break;
@@ -1788,11 +1794,8 @@ int game(InfoType &info){
                 if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
                     if(boss.Shield>0){
                         boss.Shield--;
-                    } else {
+                    }else{
                         boss.HP--;
-                    }
-                    if(boss.HP<0){
-                        boss.HP = 0;
                         if(player1.Alive && player2.Alive){
                             player1.Points += 250;
                             player2.Points += 250;
@@ -1803,6 +1806,9 @@ int game(InfoType &info){
                         if(player2.Alive){
                             player2.Points += 500;
                         }
+                    }
+                    if(boss.HP<0){
+                        boss.HP = 0;
                     }
                     morteInimigoSD.play();
                 }
