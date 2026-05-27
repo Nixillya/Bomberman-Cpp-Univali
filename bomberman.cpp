@@ -42,6 +42,7 @@ struct BossType{
     int Move;
     int HP;
     int MaxHP;
+    int Shield = 0;
     bool Alive = false;
     int Clock = clock();
 };
@@ -375,7 +376,11 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
             if(hp<boss.HP){
                 cout<<"\e[48;5;9m\e[38;5;9m \e[0m";
             }else{
-                cout<<"\e[48;5;0m\e[38;5;0m \e[0m";
+                if((hp<boss.HP+boss.Shield) && boss.Shield>0){
+                    cout<<"\e[48;5;255m\e[38;5;255m \e[0m";
+                }else{
+                    cout<<"\e[48;5;0m\e[38;5;0m \e[0m";
+                }
             }
         }
     }else{
@@ -507,7 +512,7 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
                     enemys[enemy].Pos.Y = -1;
                     enemys[enemy].Pos.X = -1;
                     if(boss.HP>1){
-                        boss.HP--;  
+                        boss.HP--;
                     }
                     sound = 2;
                 }
@@ -651,10 +656,12 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                                 combo+=0.333333333333333333333333333333333333333333333333333333334;
                             }
                             if(player.Pos.Y+y == boss.Pos.Y && player.Pos.X+x == boss.Pos.X){
-                                if(boss.HP>1){
+                                if(boss.Shield>0){
+                                    boss.Shield--;
+                                }else{
                                     boss.HP--;
+                                    player.Points += 500;
                                 }
-                                player.Points += 500;
                             }
                         }
                     }
@@ -1597,6 +1604,11 @@ int game(InfoType &info){
                     if(enemys[enemy].Pos.Y == boxs[box].Pos.Y && enemys[enemy].Pos.X == boxs[box].Pos.X){
                         boxs[box].Pos.Y = -1;
                         boxs[box].Pos.X = -1;
+                        if(boss.Alive){
+                            if(boss.HP+1<=boss.MaxHP){
+                                boss.Shield++;
+                            }
+                        }
                     }
                 }
 
@@ -1750,11 +1762,17 @@ int game(InfoType &info){
                 }
             }
         }
+//----------------------------< SISTEMA DOS INIMIGOS <----------------------------//
+
+//----------------------------> SISTEMA DO BOSS >----------------------------//
         if(boss.Alive){
             if(clock()-boss.Clock >= 100){
                 boss.Clock = clock();
                 boss.Target.Y = 0;
                 boss.Target.X = 0;
+                if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
+                    boss.Move = 0;
+                }
                 if(boss.Move==1){
                     boss.Target.Y++;
                 }
@@ -1768,19 +1786,23 @@ int game(InfoType &info){
                     boss.Target.X--;
                 }
                 if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
-                    boss.HP--;
+                    if(boss.Shield>0){
+                        boss.Shield--;
+                    } else {
+                        boss.HP--;
+                    }
                     if(boss.HP<0){
                         boss.HP = 0;
-                    }
-                    if(player1.Alive && player2.Alive){
-                        player1.Points += 250;
-                        player2.Points += 250;
-                    }
-                    if(player1.Alive){
-                        player1.Points += 500;
-                    }
-                    if(player2.Alive){
-                        player2.Points += 500;
+                        if(player1.Alive && player2.Alive){
+                            player1.Points += 250;
+                            player2.Points += 250;
+                        }
+                        if(player1.Alive){
+                            player1.Points += 500;
+                        }
+                        if(player2.Alive){
+                            player2.Points += 500;
+                        }
                     }
                     morteInimigoSD.play();
                 }
@@ -1808,18 +1830,72 @@ int game(InfoType &info){
                         boss.Move = 0;
                     }
                 }
-                if(theres_bomb(bombs1,maximumBombs) || theres_bomb(bombs2,maximumBombs)){
-                    if(rand()%2==0){
-                        boss.Move = rand()%4+1;
-                    }
-                }
+
                 if(boss.HP>0){
                     if(boss.Move==0){
                         if(rand()%boss.HP==0){
-                            int enemy = rand()%enemysQuantity;
-                            enemys[enemy].Pos.Y = boss.Pos.Y;
-                            enemys[enemy].Pos.X = boss.Pos.X;
+                            bool success = true;
+                            for(int enemy=0;enemy<enemysQuantity;enemy++){
+                                if(enemys[enemy].Pos.Y == boss.Pos.Y && enemys[enemy].Pos.X == boss.Pos.X){
+                                    success = false;
+                                    break;
+                                }
+                            }
+                            if(success){
+                                int enemy = rand()%enemysQuantity;
+                                enemys[enemy].Pos.Y = boss.Pos.Y;
+                                enemys[enemy].Pos.X = boss.Pos.X;
+                            }
                         }
+                    }
+                }
+                if(boss.HP==1 || boss.Move==0){
+                    int player = 0;
+                    if(player1.Alive && player1.Invincible==0){
+                        player = 1;
+                    }
+                    if(player2.Alive && player2.Invincible==0){
+                        player = 2;
+                    }
+                    if((player1.Alive && player1.Invincible==0) && (player2.Alive && player2.Invincible==0)){
+                        player = rand()%2+1;
+                    }
+                    if((!player1.Alive || player1.Invincible!=0) && (!player2.Alive || player2.Invincible!=0)){
+                        player = 0;
+                    }
+                    if(player!=0){
+                        int y = 0;
+                        int x = 0;
+                        if(player==1){
+                            y = boss.Pos.Y-player1.Pos.Y;
+                            x = boss.Pos.X-player1.Pos.X;
+                        }
+                        if(player==2){
+                            y = boss.Pos.Y-player2.Pos.Y;
+                            x = boss.Pos.X-player2.Pos.X;
+                        }
+                        if(rand()%2==0){
+                            if(y<0){
+                                boss.Move = 1;
+                            }
+                            if(y>0){
+                                boss.Move = 2;
+                            }
+                        }else{
+                            if(x<0){
+                                boss.Move = 3;
+                            }
+                            if(x>0){
+                                boss.Move = 4;
+                            }
+                        }
+                    }else{
+                        boss.Move = rand()%4+1;
+                    }
+                }
+                if(theres_bomb(bombs1,maximumBombs) || theres_bomb(bombs2,maximumBombs)){
+                    if(rand()%2==0){
+                        boss.Move = rand()%4+1;
                     }
                 }
                 if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock){
@@ -1830,10 +1906,13 @@ int game(InfoType &info){
                 for(int box=0;box<fragileWallQuantity;box++){
                     if(boxs[box].Pos.Y == boss.Pos.Y && boxs[box].Pos.X == boss.Pos.X){
                         boxs[box].Pos.Y = -1;
-                        boxs[box].Pos.X = -1;    
+                        boxs[box].Pos.X = -1;   
+                        if(boss.HP+1<=boss.MaxHP){
+                            boss.Shield++;
+                        }
                     }
                 }
-                if(rand()%10==0){
+                if(rand()%4==0){
                     bool success = false;
                     for(int y=-1;y<=1;y++){
                         if(success){
@@ -1871,11 +1950,12 @@ int game(InfoType &info){
         }
         if(boss.HP<=0){
             boss.HP = 0;
+            boss.Shield = 0;
             boss.Pos.Y = -1;
             boss.Pos.X = -1;
             boss.Alive = false;
         }
-//----------------------------< SISTEMA DOS INIMIGOS <----------------------------//
+//----------------------------< SISTEMA DO BOSS <----------------------------//
 
 //-----------------------------------> SISTEMA DAS BOMBAS >-----------------------------------//
         sound1 = 0;
@@ -2145,6 +2225,7 @@ int main(){
                         musicaDerrotaSD.stop();
                         cout<<"\ec\e[?25l";
                         int deadMenu = -1;
+                        info.phase = 3;
                         if(game(info)){
                             if(info.phase>3){
                                 info.maxPoints = info.player1.Points+info.player2.Points;
@@ -2223,7 +2304,7 @@ int main(){
                                         }
                                         if(deadMenu==1 || deadMenu==3){
                                             info.timer = {0,0,0};
-                                            info.phase = 1;
+                                            info.phase = 3;
                                             info.maxPoints = 0;
                                             info.player1.TotalMoves = 0;
                                             info.player1.Totalbombs = 0;
@@ -2431,8 +2512,8 @@ int main(){
                                                     cout << "┃ - Crono-Hourglass (◊): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de                 ┃\n";
                                                     cout << "┃   um inimigo.                                                                                               ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Aegis (☖): Um escudo que protege o jogador de ataques inimigos e ao ser utilizado mata todos ao redor    ┃\n";
-                                                    cout << "┃   porém dobra o dano recebido da bomba.                                                                              ┃\n";
+                                                    cout << "┃ - Aegis (☖): Um escudo que protege o jogador de ataques inimigos e ao ser utilizado mata todos ao redor     ┃\n";
+                                                    cout << "┃   porém dobra o dano recebido da bomba.                                                                     ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - ÔM3GA (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá                      ┃\n";
                                                     cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
