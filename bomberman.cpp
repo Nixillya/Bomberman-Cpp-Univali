@@ -2138,6 +2138,7 @@ int main(){
                         cout<<"\ec\e[?25l";
                         int deadMenu = -1;
                         if(game(info)){
+                            info.maxPoints = info.player1.Points+info.player2.Points;
                             if(info.phase>3){
                                 musicaVitoriaSD.play();
                                 cout<<"\e[12;"<<mapSizeX+3<<"H";
@@ -2157,7 +2158,6 @@ int main(){
                             cout << "┃ \e[38;5;9mDERROTA!\e[0m           ┃\n";
                             deadMenu = 1;
                         }
-                        info.maxPoints = info.player1.Points+info.player2.Points;
                         cout<<"\e[9;"<<mapSizeX+3<<"H";
                         new_line("┏","━","┓",20);
                         cout<<"\e[10;"<<mapSizeX+3<<"H";
