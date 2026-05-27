@@ -286,6 +286,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
     if(player1.Item==5){
         cout<<"[☖]";
     }
+    if(player1.Item==6){
+        cout<<"[#]";
+    }
     cout<<"\e[0m";
     // <<< PLAYER1
 
@@ -378,6 +381,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         }
         if(player2.Item==5){
             cout<<"[☖]";
+        }
+        if(player2.Item==6){
+            cout<<"[#]";
         }
         cout<<"\e[0m";
     }
@@ -613,7 +619,7 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                 }else{
                     bool success = false;
                     while (!success){
-                        int item = rand()%4+1;
+                        int item = rand()%5+1;
                         player.Slot = 4;
                         player.Item = item;
                         if(player.Item == 2){
@@ -728,10 +734,14 @@ void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &tar
             }
             bombs[player.ActualBomb].Range = 2000;
         }
-        bombs[player.ActualBomb].Pos.Y = player.Pos.Y;
-        bombs[player.ActualBomb].Pos.X = player.Pos.X;
-        bombs[player.ActualBomb].Time = clock();
-        player.ActualBomb++;
+        if(player.Item == 6){
+            map[player.Pos.Y][player.Pos.X] = fragileBlock;
+        }else{
+            bombs[player.ActualBomb].Pos.Y = player.Pos.Y;
+            bombs[player.ActualBomb].Pos.X = player.Pos.X;
+            bombs[player.ActualBomb].Time = clock();
+            player.ActualBomb++;
+        }
     }
 }
 
