@@ -40,8 +40,8 @@ struct BossType{
     XY Pos;
     XY Target;
     int Move;
-    int HP;
-    int MaxHP;
+    int HP = 0;
+    int MaxHP = 0;
     int Shield = 0;
     bool Alive = false;
     int Clock = clock();
@@ -1605,7 +1605,7 @@ int game(InfoType &info){
                         boxs[box].Pos.Y = -1;
                         boxs[box].Pos.X = -1;
                         if(boss.Alive){
-                            if(boss.HP+1<=boss.MaxHP){
+                            if(boss.HP+boss.Shield<boss.MaxHP){
                                 boss.Shield++;
                             }
                         }
@@ -1907,7 +1907,7 @@ int game(InfoType &info){
                     if(boxs[box].Pos.Y == boss.Pos.Y && boxs[box].Pos.X == boss.Pos.X){
                         boxs[box].Pos.Y = -1;
                         boxs[box].Pos.X = -1;   
-                        if(boss.HP+1<=boss.MaxHP){
+                        if(boss.HP+boss.Shield<boss.MaxHP){
                             boss.Shield++;
                         }
                     }
