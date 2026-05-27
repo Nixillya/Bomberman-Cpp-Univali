@@ -2225,7 +2225,6 @@ int main(){
                         musicaDerrotaSD.stop();
                         cout<<"\ec\e[?25l";
                         int deadMenu = -1;
-                        info.phase = 3;
                         if(game(info)){
                             if(info.phase>3){
                                 info.maxPoints = info.player1.Points+info.player2.Points;
@@ -2304,7 +2303,7 @@ int main(){
                                         }
                                         if(deadMenu==1 || deadMenu==3){
                                             info.timer = {0,0,0};
-                                            info.phase = 3;
+                                            info.phase = 1;
                                             info.maxPoints = 0;
                                             info.player1.TotalMoves = 0;
                                             info.player1.Totalbombs = 0;
