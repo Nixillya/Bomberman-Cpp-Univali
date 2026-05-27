@@ -279,9 +279,6 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
     if(player1.Item==5){
         cout<<"[☖]";
     }
-    if(player1.Item==6){
-        cout<<"[ᛟ]";
-    }
     cout<<"\e[0m";
 
     if(info.players==3){
@@ -369,9 +366,6 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         }
         if(player2.Item==5){
             cout<<"[☖]";
-        }
-        if(player2.Item==6){
-            cout<<"[ᛟ]";
         }
         cout<<"\e[0m";
     }
@@ -2437,10 +2431,8 @@ int main(){
                                                     cout << "┃ - Crono-Hourglass (◊): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de                 ┃\n";
                                                     cout << "┃   um inimigo.                                                                                               ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Claymore (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade passa por cima dela.            ┃\n";
-                                                    new_line("┣","━","┫",109);
                                                     cout << "┃ - Aegis (☖): Um escudo que protege o jogador de ataques inimigos e ao ser utilizado mata todos ao redor    ┃\n";
-                                                    cout << "┃   porém dobra o dano da bomba.                                                                              ┃\n";
+                                                    cout << "┃   porém dobra o dano recebido da bomba.                                                                              ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - ÔM3GA (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá                      ┃\n";
                                                     cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
