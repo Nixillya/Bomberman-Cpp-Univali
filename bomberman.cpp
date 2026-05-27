@@ -219,9 +219,6 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
     cout<<"["<<player1.TotalMoves<<"]["<<player1.Totalbombs<<"]";
 
     cout<<"\e[3;"<<mapSizeX+4<<"H";
-    if(player1.Slot==5){
-        cout<<"\e[38;5;9m";
-    }
     cout<<"[";
     if(player1.Slot==1){
         cout<<"\e[38;5;3m";
@@ -248,6 +245,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         cout<<"\e[0m";
         if(player1.Slot==3){
             cout<<"\e[38;5;3m";
+        }
+        if(player1.Slot==5){
+            cout<<"\e[38;5;9m";
         }
     }
     cout<<" ♥:";
@@ -312,9 +312,6 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         cout<<"["<<player2.TotalMoves<<"]["<<player2.Totalbombs<<"]";
 
         cout<<"\e[7;"<<mapSizeX+4<<"H";
-        if(player2.Slot==5){
-            cout<<"\e[38;5;9m";
-        }
         cout<<"[";
         if(player2.Slot==1){
             cout<<"\e[38;5;3m";
@@ -341,6 +338,9 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
             cout<<"\e[0m";
             if(player2.Slot==3){
                 cout<<"\e[38;5;3m";
+            }
+            if(player2.Slot==5){
+                cout<<"\e[38;5;9m";
             }
         }
         cout<<" ♥:";
