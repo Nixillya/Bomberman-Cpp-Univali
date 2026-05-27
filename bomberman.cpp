@@ -104,12 +104,17 @@ void mostrar_pontos(){
     int j = 1;
     int pointsMax = 0;
     string ignore;
-    ifstream file("Scores.txt");
+    ifstream file;
 
     // Conta quantos pontos tem no arquivo para definir o tamanho dos arrays
-    while(!file.eof()){
-        file>>ignore;
-        pointsMax++;
+    file.open("Scores.txt");
+    if(file.is_open()){
+        while(!file.eof()){
+            file>>ignore;
+            pointsMax++;
+        }
+    }else{
+        pointsMax = 1;
     }
     file.close();
 
@@ -122,14 +127,16 @@ void mostrar_pontos(){
 
     // Lê o arquivo novamente, mas dessa vez armazena os pontos e os nomes em arrays para depois ordenar e mostrar na tela
     file.open("Scores.txt");
-    while(!file.eof()){
-        if(i%2==0){
-            file>>pontos[j];
-            j++;
-        }else{
-            file>>nomes[j];
+    if(file.is_open()){
+        while(!file.eof()){
+            if(i%2==0){
+                file>>pontos[j];
+                j++;
+            }else{
+                file>>nomes[j];
+            }
+            i++;
         }
-        i++;
     }
     file.close();
 
@@ -158,7 +165,7 @@ void mostrar_pontos(){
         cout<<"    Nenhuma pontuação registrada"<<endl;
     }
     for(int i=1; i<pointsMax; i++){
-        cout<<"    "<<i<<" - "<<nomes[i]<<"  "<<pontos[i]<<endl;
+        cout<<"    "<<i<<" - "<<nomes[i]<<"   \e[38;5;46m"<<pontos[i]<<"\e[0m"<<endl;
     }
 }
 
@@ -236,7 +243,7 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
             cout<<"\e[38;5;3m";
         }
     }
-    cout<<" ☤:";
+    cout<<" ♥:";
     if(player1.Lifes<10){
         cout<<"0"<<player1.Lifes;
     }else{
@@ -268,6 +275,12 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
     }
     if(player1.Item==4){
         cout<<"[ᛰ]";
+    }
+    if(player1.Item==5){
+        cout<<"[☖]";
+    }
+    if(player1.Item==6){
+        cout<<"[ᛟ]";
     }
     cout<<"\e[0m";
 
@@ -321,7 +334,7 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
                 cout<<"\e[38;5;3m";
             }
         }
-        cout<<" ☤:";
+        cout<<" ♥:";
         if(player2.Lifes<10){
             cout<<0<<player2.Lifes;
         }else{
@@ -353,6 +366,12 @@ void render_details(InfoType &info,PlayerType &player1,PlayerType &player2,BossT
         }
         if(player2.Item==4){
             cout<<"[ᛰ]";
+        }
+        if(player2.Item==5){
+            cout<<"[☖]";
+        }
+        if(player2.Item==6){
+            cout<<"[ᛟ]";
         }
         cout<<"\e[0m";
     }
@@ -551,18 +570,61 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
             }
         }
     }
+    if(player.Item == 5){
+        int combo = 1;
+        for(int enemy = 0; enemy < enemysQuantity; enemy++){
+            if((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) || (player.Pos.Y == boss.Pos.Y && player.Pos.X == boss.Pos.X)){
+                player.Item = 0;
+                if(player.Slot==4){
+                    player.Slot = 0;
+                }
+                enemys[enemy].Pos.Y = -1;
+                enemys[enemy].Pos.X = -1;
+                player.Points += 250 * combo;
+                combo+=0.333333333333333333333333333333333333333333333333333333334;
+                for(int y=-1;y<=1;y++){
+                    for(int x=-1;x<=1;x++){
+                        if(y!=0 && x!=0){
+                            if(player.Pos.Y+y == enemys[enemy].Pos.Y && player.Pos.X+x == enemys[enemy].Pos.X){
+                                enemys[enemy].Pos.Y = -1;
+                                enemys[enemy].Pos.X = -1;
+                                player.Points += 250 * combo;
+                                combo+=0.333333333333333333333333333333333333333333333333333333334;
+                            }
+                            if(player.Pos.Y+y == boss.Pos.Y && player.Pos.X+x == boss.Pos.X){
+                                if(boss.HP>1){
+                                    boss.HP--;
+                                }
+                                player.Points += 500;
+                            }
+                        }
+                    }
+                }
+                sound  = 5;
+            }
+        }
+    }
     if(map[player.Pos.Y][player.Pos.X] == explosionBlock && player.Invincible == 0){
         lost_life(player, moveEnemy, timerClock);
+        if(player.Item==5){
+            lost_life(player, moveEnemy, timerClock);
+            player.Item = 0;
+            if(player.Slot==4){
+                player.Slot = 0;
+            }
+        }
         sound = 1;
     }
-    if((player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X) && player.Invincible == 0){
-        lost_life(player, moveEnemy, timerClock);
-        sound = 1;
-    }
-    for(int enemy = 0; enemy < enemysQuantity; enemy++){
-        if ((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) && player.Invincible == 0){
+    if(player.Item!=5){
+        if((player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X) && player.Invincible == 0){
             lost_life(player, moveEnemy, timerClock);
             sound = 1;
+        }
+        for(int enemy = 0; enemy < enemysQuantity; enemy++){
+            if ((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) && player.Invincible == 0){
+                lost_life(player, moveEnemy, timerClock);
+                sound = 1;
+            }
         }
     }
     for(int box = 0; box < fragileWallQuantity; box++){
@@ -588,7 +650,7 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                 }else{
                     bool success = false;
                     while (!success){
-                        int item = rand() % 4 + 1;
+                        int item = rand() % 5 + 1;
                         player.Slot = 4;
                         player.Item = item;
                         if(player.Item == 2){
@@ -1146,12 +1208,18 @@ int game(InfoType &info){
         }
         new_line("┗","━","┛",mapSizeX);
         render_details(info,player1,player2,boss);
-        if((!player1.Alive) && (!player2.Alive)){
-            return 0;
-        }
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
 //----------------------> SISTEMA DO PLAYER >----------------------//
+        if((!player1.Alive) && (!player2.Alive)){
+            return 0;
+        }
+        if(!player1.Alive){
+            player1.Points = 0;
+        }
+        if(!player2.Alive){
+            player2.Points = 0;
+        }
         if((player1.Pos.Y == portal.Pos.Y && player1.Pos.X == portal.Pos.X) || (player2.Pos.Y == portal.Pos.Y && player2.Pos.X == portal.Pos.X)){
             info.phase++;
             return 1;
@@ -1177,6 +1245,9 @@ int game(InfoType &info){
         }
         if(sound1==4 || sound2==4){
             espectroSD.play();
+        }
+        if(sound1 == 5 || sound2 == 5){
+            morteInimigoSD.play();
         }
 
         if (kbhit() || info.players==1){
@@ -1605,7 +1676,8 @@ int game(InfoType &info){
                         }
                         if((player1.Alive && player1.Invincible==0) && (player2.Alive && player2.Invincible==0)){
                             player = rand()%2+1;
-                        }else{
+                        }
+                        if((!player1.Alive || player1.Invincible!=0) && (!player2.Alive || player2.Invincible!=0)){
                             player = 0;
                         }
                         if(player!=0){
@@ -1826,8 +1898,14 @@ int game(InfoType &info){
 
 //------------------------------> TIMER >------------------------------//
         if((clock()-timerClock)>=1000){
-            player1.Points--;
-            player2.Points--;
+            if(portal.Pos.Y==-1 && portal.Pos.X==-1){
+                if(player1.Alive){
+                    player1.Points--;
+                }
+                if(player2.Alive){
+                    player2.Points--;
+                }
+            }
             if(player1.Invincible>0){
                 player1.Invincible--;
             }
@@ -2079,7 +2157,6 @@ int main(){
                             cout << "┃ \e[38;5;9mDERROTA!\e[0m           ┃\n";
                             deadMenu = 1;
                         }
-
                         info.maxPoints = info.player1.Points+info.player2.Points;
                         cout<<"\e[9;"<<mapSizeX+3<<"H";
                         new_line("┏","━","┓",20);
@@ -2328,7 +2405,7 @@ int main(){
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - Polvoras (◈): Mostra qual o raio da explosão                                                              ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Vidas (☤): Mostra a quantidade de vidas que o jogador tem                                                 ┃\n";
+                                                    cout << "┃ - Vidas (♥): Mostra a quantidade de vidas que o jogador tem                                                 ┃\n";
                                                     cout << "┃      Ao perder uma vida o jogador fica invencivel por 3 segundos.                                           ┃\n";
                                                     cout << "┃      E Todas as outras passivas são perdidas e resetadas para 1.                                            ┃\n";
                                                     new_line("┗","━","┛",109);
@@ -2344,15 +2421,17 @@ int main(){
                                                     cout << "┃ - Crono-Hourglass (◊): Uma ampulheta capaz de congelar todos os inimigos ao chegar perto de                 ┃\n";
                                                     cout << "┃   um inimigo.                                                                                               ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Claymore (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
-                                                    cout << "┃   cima dela.                                                                                                ┃\n";
+                                                    cout << "┃ - Claymore (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade passa por cima dela.            ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Aegis (ᛟ): Um explosivo anti-pessoal, se detona quando alguma entidade (jogador ou inimigo) passa por  ┃\n";
-                                                    cout << "┃   cima dela.                                                                                                ┃\n";
+                                                    cout << "┃ - Aegis (☖): Um escudo que protege o jogador de ataques inimigos e ao ser utilizado mata todos ao redor    ┃\n";
+                                                    cout << "┃   porém dobra o dano da bomba.                                                                              ┃\n";
                                                     new_line("┣","━","┫",109);
                                                     cout << "┃ - ÔM3GA (Ω): Um explosivo com um grande poder de destruição, a explosão da 'ÔM3GA' irá                      ┃\n";
                                                     cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
                                                     cout << "┃   fragéis, inimigos, jogadores.                                                                             ┃\n";
+                                                    new_line("┣","━","┫",109);
+                                                    cout << "┃ - Pandora (ᛰ): Uma bomba na qual faz uma trajetoria aleatória, e vai parar apenas ao                        ┃\n";
+                                                    cout << "┃   acertar um jogador ou parede fragil podendo matar multiplos inimigos ao mesmo tempo.                      ┃\n";
                                                     new_line("┗","━","┛",109);
                                             break;
                                         }
