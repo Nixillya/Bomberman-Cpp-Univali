@@ -1234,13 +1234,11 @@ int game(InfoType &info){
         }
         sound1 = 0;
         sound2 = 0;
-        sound1 = player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
-        sound2 = player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
-        if(!player1.Alive){
-            sound1 = 0;
+        if(player1.Alive){
+            sound1 = player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
         }
-        if(!player2.Alive){
-            sound2 = 0;
+        if(player2.Alive){
+            sound2 = player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
         }
         if(sound1==1 || sound2==1){
             perdeuVidaSD.play();
@@ -1907,11 +1905,19 @@ int game(InfoType &info){
 //------------------------------> TIMER >------------------------------//
         if((clock()-timerClock)>=1000){
             if(portal.Pos.Y==-1 && portal.Pos.X==-1){
-                if(player1.Alive){
-                    player1.Points--;
-                }
-                if(player2.Alive){
-                    player2.Points--;
+                if(player1.Alive && player2.Alive){
+                    if(rand()%2==0){
+                        player1.Points--;
+                    }else{
+                        player2.Points--;
+                    }
+                }else{
+                    if(player1.Alive){
+                        player1.Points--;
+                    }
+                    if(player2.Alive){
+                        player2.Points--;
+                    }
                 }
             }
             if(player1.Invincible>0){
