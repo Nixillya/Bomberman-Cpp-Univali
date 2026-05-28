@@ -481,28 +481,20 @@ bool explode_pandora(int map[mapSizeY][mapSizeX], BombType bomb, PlayerType play
                 }
             }
         }
+        if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == freeBlock){
+            success = false;
+        }
         if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock){
             success = false;
         }
-        if(bomb.Pos.Y+y == player1.Pos.Y && bomb.Pos.X+x == player1.Pos.X){
+        if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == explosionBlock){
             success = false;
-        }
-        if(bomb.Pos.Y+y == player2.Pos.Y && bomb.Pos.X+x == player2.Pos.X){
-            success = false;
-        }
-        if(bomb.Pos.Y+y == boss.Pos.Y && bomb.Pos.X+x == boss.Pos.X){
-            success = false;
-        }
-        for(int enemy = 0; enemy < enemysQuantity; enemy++){
-            if(bomb.Pos.Y+y == enemys[enemy].Pos.Y && bomb.Pos.X+x == enemys[enemy].Pos.X){
-                success = false;
-            }
         }
         if(success){
             map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
         }else{
             map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
-            if(rand()%4==0){
+            if(rand()%100==0){
                 return false;
             }
         }
@@ -562,11 +554,14 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
     return sound;
 }
 
-void lost_life(PlayerType &player, int &moveEnemy, int &timerClock){
+void lost_life(InfoType info, PlayerType &player, int &moveEnemy, int &timerClock){
     player.Lifes--;
     player.Slot = 5;
     if (player.Lifes >= 1){
         player.Points -= 250;
+        if(info.phase==3){
+            player.Points -= 250;
+        }
         player.MaxBombs = 1;
         player.MaxRange = 1;
         moveEnemy = clock();
@@ -581,27 +576,27 @@ void lost_life(PlayerType &player, int &moveEnemy, int &timerClock){
     }
 }
 
-int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType boss){
+int player_verifier(InfoType info, int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType &boss){
     int sound = 0;
     if(map[player.Pos.Y][player.Pos.X] == explosionBlock && player.Invincible == 0){
-        lost_life(player, moveEnemy, timerClock);
         if(player.Item==5){
-            lost_life(player, moveEnemy, timerClock);
+            lost_life(info, player, moveEnemy, timerClock);
             player.Item = 0;
             if(player.Slot==4){
                 player.Slot = 0;
             }
         }
-        sound = 1;
-    }
-    if((player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X) && player.Invincible == 0){
-        lost_life(player, moveEnemy, timerClock);
+        lost_life(info, player, moveEnemy, timerClock);
         sound = 1;
     }
     if(player.Item!=5){
+        if((player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X) && player.Invincible == 0){
+            lost_life(info, player, moveEnemy, timerClock);
+            sound = 1;
+        }
         for(int enemy = 0; enemy < enemysQuantity; enemy++){
             if ((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) && player.Invincible == 0){
-                lost_life(player, moveEnemy, timerClock);
+                lost_life(info, player, moveEnemy, timerClock);
                 sound = 1;
             }
         }
@@ -629,7 +624,7 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                 }else{
                     bool success = false;
                     while (!success){
-                        int item = 5;
+                        int item = rand()%6+1;
                         player.Slot = 4;
                         player.Item = item;
                         if(player.Item == 2){
@@ -645,7 +640,8 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
         for(int enemy = 0; enemy < enemysQuantity; enemy++){
             for(int y = -1; y <= 1; y++){
                 for(int x = -1; x <= 1; x++){
-                    if((player.Pos.Y + y == enemys[enemy].Pos.Y && player.Pos.X + x == enemys[enemy].Pos.X)){
+                    if((player.Pos.Y+y == enemys[enemy].Pos.Y && player.Pos.X+x == enemys[enemy].Pos.X) || (player.Pos.Y+y == boss.Pos.Y && player.Pos.X+x == boss.Pos.X)){
+                        player.Invincible = 1;
                         freezeEnemys = 3;
                         player.Item = 0;
                         timerClock = clock();
@@ -658,21 +654,39 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
     if(player.Item == 5){
         int combo = 1;
         int success = false;
-        for(int enemy = 0; enemy < enemysQuantity; enemy++){
-            if((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X)){
-                player.Item = 0;
-                if(player.Slot==4){
-                    player.Slot = 0;
+        if(player.Pos.Y == boss.Pos.Y && player.Pos.X == boss.Pos.X){
+            player.Item = 0;
+            if(player.Slot==4){
+                player.Slot = 0;
+            }
+            if(boss.Shield>0){
+                boss.Shield--;
+            }
+            success = true;
+        }
+        if(!success){
+            for(int enemy = 0; enemy < enemysQuantity; enemy++){
+                if((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X)){
+                    player.Item = 0;
+                    if(player.Slot==4){
+                        player.Slot = 0;
+                    }
+                    enemys[enemy].Pos.Y = -1;
+                    enemys[enemy].Pos.X = -1;
+                    player.Points += 250 * combo;
+                    combo+=0.333333333333333333333333333333333333333333333333333333334;
+                    if(boss.Alive){
+                        if(boss.HP>1){
+                            boss.HP--;
+                        }
+                    }
+                    success = true;
                 }
-                enemys[enemy].Pos.Y = -1;
-                enemys[enemy].Pos.X = -1;
-                player.Points += 250 * combo;
-                combo+=0.333333333333333333333333333333333333333333333333333333334;
-                success = true;
-                sound  = 5;
             }
         }
         if(success){
+            sound = 5;
+            player.Invincible = 2;
             for(int enemy = 0; enemy < enemysQuantity; enemy++){
                 for(int y=-1;y<=1;y++){
                     for(int x=-1;x<=1;x++){
@@ -683,13 +697,14 @@ int player_verifier(int enemysQuantity, PlayerType &player, EnemyType enemys[], 
                                 player.Points += 250 * combo;
                                 combo+=0.333333333333333333333333333333333333333333333333333333334;
                                 if(boss.Alive){
-                                    if(boss.Shield>0){
-                                        boss.Shield--;
-                                    }else{
-                                        if(boss.HP>1){
-                                            boss.HP--;
-                                        }
+                                    if(boss.HP>1){
+                                        boss.HP--;
                                     }
+                                }
+                            }
+                            if(player.Pos.Y+y == boss.Pos.Y && player.Pos.X+x == boss.Pos.X){
+                                if(boss.Shield>0){
+                                    boss.Shield--;
                                 }
                             }
                         }
@@ -747,6 +762,10 @@ void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &tar
         }
         if(player.Item == 6){
             map[player.Pos.Y][player.Pos.X] = fragileBlock;
+            player.Item = 0;
+            if(player.Slot==4){
+                player.Slot = 0;
+            }
         }else{
             bombs[player.ActualBomb].Pos.Y = player.Pos.Y;
             bombs[player.ActualBomb].Pos.X = player.Pos.X;
@@ -1107,11 +1126,20 @@ int game(InfoType &info){
                  if(block){
                     if(y==boss.Pos.Y && x==boss.Pos.X){
                         block = false;
-                        if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
-                            cout << "\e[0;43m\e[38;5;90m\u25A1";
+                        if(freezeEnemys-2<=0){
+                            if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
+                                cout << "\e[0;43m\e[38;5;90m\u25A1";
+                            }else{
+                                cout << "\e[0;42m\e[38;5;90m\u25A0"; // BOSS
+                            }
                         }else{
-                            cout << "\e[0;42m\e[38;5;90m\u25A0"; // BOSS
+                            if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
+                                cout << "\e[0;43m\e[38;5;53m\u25A1";
+                            }else{
+                                cout << "\e[0;42m\e[38;5;53m\u25A0"; // BOSS CONGELADO
+                            }
                         }
+
                     }
                  }
                  if(block){
@@ -1269,10 +1297,10 @@ int game(InfoType &info){
         sound1 = 0;
         sound2 = 0;
         if(player1.Alive){
-            sound1 = player_verifier(enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+            sound1 = player_verifier(info, enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
         }
         if(player2.Alive){
-            sound2 = player_verifier(enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+            sound2 = player_verifier(info, enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
         }
         if(sound1==1 || sound2==1){
             perdeuVidaSD.play();
@@ -1805,7 +1833,13 @@ int game(InfoType &info){
 
 //----------------------------> SISTEMA DO BOSS >----------------------------//
         if(boss.Alive){
-            if(clock()-boss.Clock >= 100){
+            if((clock()-boss.Clock >= 100) && freezeEnemys-2<=0){
+                if(boss.HP>boss.MaxHP){
+                    boss.HP = boss.MaxHP;
+                }
+                if(boss.HP+boss.Shield>boss.MaxHP){
+                    boss.Shield--;
+                }
                 boss.Clock = clock();
                 boss.Target.Y = 0;
                 boss.Target.X = 0;
@@ -1848,11 +1882,27 @@ int game(InfoType &info){
                 boss.Pos.Y+=boss.Target.Y;
                 boss.Pos.X+=boss.Target.X;
                 
-                if(rand()%4==0){
-                    if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
-                        map[boss.Pos.Y][boss.Pos.X] = freeBlock;
-                        boss.Pos.Y-=boss.Target.Y;
-                        boss.Pos.X-=boss.Target.X;
+                if(rand()%2==0){
+                    int doit = rand()%2;
+                    if(doit==0){
+                        if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
+                            map[boss.Pos.Y][boss.Pos.X] = freeBlock;
+                            boss.Pos.Y-=boss.Target.Y;
+                            boss.Pos.X-=boss.Target.X;
+                        }
+                    }else{
+                        if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
+                            map[boss.Pos.Y][boss.Pos.X] = solidBlock;
+                            boss.Pos.Y-=boss.Target.Y;
+                            boss.Pos.X-=boss.Target.X;
+                        }
+                    }
+                    if(boss.Pos.Y>0 && boss.Pos.Y<mapSizeY-1 && boss.Pos.X>0 && boss.Pos.X<mapSizeX-1){
+                        if(map[boss.Pos.Y][boss.Pos.X]==solidBlock){
+                            map[boss.Pos.Y][boss.Pos.X] = fragileBlock;
+                            boss.Pos.Y-=boss.Target.Y;
+                            boss.Pos.X-=boss.Target.X;
+                        }
                     }
                 }
                 if(map[boss.Pos.Y][boss.Pos.X]==explosionBlock || map[boss.Pos.Y][boss.Pos.X]==bombBlock || map[boss.Pos.Y][boss.Pos.X]==solidBlock || map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
@@ -1947,38 +1997,37 @@ int game(InfoType &info){
                         boxs[box].Pos.Y = -1;
                         boxs[box].Pos.X = -1;   
                         if(boss.HP+boss.Shield<boss.MaxHP){
-                            boss.Shield++;
+                            boss.Shield+=2;
                         }
                     }
                 }
                 if(rand()%4==0){
                     bool success = false;
                     for(int y=-1;y<=1;y++){
-                        if(success){
-                            break;
-                        }
                         for(int x=-1;x<=1;x++){
-                            if(success){
-                                break;
-                            }
                             if((y==0 || x==0)){
                                 if(map[BlockY][BlockX]==freeBlock){
                                     if(map[BlockY+y][BlockX+x] == solidBlock || map[BlockY+y][BlockX+x] == fragileBlock){
                                         map[BlockY][BlockX] = fragileBlock;
                                         success = true;
-                                        if(rand()%4==0){
-                                            for(int box=0;box<fragileWallQuantity;box++){
-                                                if(boxs[box].Pos.Y == BlockY && boxs[box].Pos.X == BlockX){
-                                                    boxs[box].Pos.Y = -1;
-                                                    boxs[box].Pos.X = -1;
-                                                }
-                                                if(boxs[box].Pos.Y == -1 && boxs[box].Pos.X == -1){
-                                                    boxs[box].Pos.Y = BlockY;
-                                                    boxs[box].Pos.X = BlockX;
-                                                    break;
-                                                }
-                                            }
-                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(success){
+                        if(rand()%4==0){
+                            for(int box=0;box<fragileWallQuantity;box++){
+                                if(boxs[box].Pos.Y == BlockY && boxs[box].Pos.X == BlockX){
+                                    success = false;
+                                }
+                            }
+                            if(success){
+                                for(int box=0;box<fragileWallQuantity;box++){
+                                    if(boxs[box].Pos.Y == -1 && boxs[box].Pos.X == -1){
+                                        boxs[box].Pos.Y = BlockY;
+                                        boxs[box].Pos.X = BlockX;
+                                        break;
                                     }
                                 }
                             }
@@ -2560,8 +2609,8 @@ int main(){
                                                     cout << "┃   se extender por todos os lados até chegar na borda do mapa, destruindo tudo pelo caminho: Paredes         ┃\n";
                                                     cout << "┃   fragéis, inimigos, jogadores.                                                                             ┃\n";
                                                     new_line("┣","━","┫",109);
-                                                    cout << "┃ - Pandora (ᛰ): Uma bomba na qual faz uma trajetoria aleatória, e tem 25% de chance de parar ao              ┃\n";
-                                                    cout << "┃   acertar um jogador ou parede fragil ou inimigo, podendo matar multiplos inimigos ao mesmo tempo.          ┃\n";
+                                                    cout << "┃ - Pandora (ᛰ): Uma bomba na qual faz uma trajetoria aleatória, são tão violentas que podem ter explosões    ┃\n";
+                                                    cout << "┃   imprevisíveis, então tome cuidado ao utiliza-las.                                                         ┃\n";
                                                     new_line("┗","━","┛",109);
                                             break;
                                         }
