@@ -1098,12 +1098,16 @@ int game(InfoType &info){
 
     cout << "\e[1;"<<mapSizeX+24<<"H";
     new_line("┏","━","┓",14);
-    cout << "\e[2;"<<mapSizeX+24<<"H";
-    cout << "┃["<<info.phase<<"] [00:00:00]┃";
-    cout << "\e[3;"<<mapSizeX+24<<"H";
+    cout<<"\e[2;"<<mapSizeX+24<<"H";
+    cout<<"┃["<<info.phase<<"] [00:00:00]┃";
+    cout<<"\e[3;"<<mapSizeX+24<<"H";
     new_line("┗","━","┛",14);
+    if(info.players==1){
+        cout<<"\e[4;"<<mapSizeX+24<<"H";
+        cout<<"CPU MODE";
+    }
     if(info.phase==3){
-        cout << "\e["<<mapSizeY+3<<";1H";
+        cout<<"\e["<<mapSizeY+3<<";1H";
         new_line("┏","━","┓",boss.MaxHP);
         new_line("┃"," ","┃",boss.MaxHP);
         new_line("┗","━","┛",boss.MaxHP);
@@ -2526,14 +2530,15 @@ int main(){
                                     cout << "┃ - As melhorias são geradas abaixo das paredes fragil.                          ┃\n";
                                     cout << "┃      cada parede fragil tem 1/4 de chance de ter uma melhoria.                 ┃\n";
                                     cout << "┃ - Os inimigos são gerados aleatoriamente no mapa até a fase 2.                 ┃\n";
+                                    cout << "┃      Na fase 2 a quantidade de inimigos é duplicada.                           ┃\n";
                                     cout << "┃ - O jogador sempre vai ser gerado numa areá possivelmente segura.              ┃\n";
                                     cout << "┃ - O Jogador2 sempre vai ser gerado com o jogador1.                             ┃\n";
                                     cout << "┃                                                                                ┃\n";
                                     cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ INIMIGOS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
                                     cout << "┃                                                                                ┃\n";
-                                    cout << "┃ - Os inimigos se movem aleatoriamente no modo fácil,                           ┃\n";
-                                    cout << "┃   no médio 50% dos movimentos vão para o jogador,                              ┃\n";
-                                    cout << "┃   no difícil 75% dos movimentos vão para o jogador,                            ┃\n";
+                                    cout << "┃ - Os inimigos se movem aleatoriamente no modo fácil e são 3 inimigos,          ┃\n";
+                                    cout << "┃   no médio 50% dos movimentos vão para o jogador, e são 5 inimigos.            ┃\n";
+                                    cout << "┃   no difícil 75% dos movimentos vão para o jogador, e são 7 inimigos.          ┃\n";
                                     cout << "┃ - Os inimigos podem destruir melhorias ao passar por cima delas.               ┃\n";
                                     cout << "┃ - Os inimigos se movem aleatoriamente quando existe uma bomba no mapa.         ┃\n";
                                     cout << "┃                                                                                ┃\n";
