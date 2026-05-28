@@ -611,7 +611,7 @@ int player_verifier(InfoType info,PositionType portal, int enemysQuantity, Playe
                 sound = 2;
                 boxs[box].Pos.Y = -1;
                 boxs[box].Pos.X = -1;
-                if (rand()%4!=0){
+                if (rand()%2!=0){
                     int item = rand() % 3;
                     if (item == 0){
                         player.MaxBombs++;
