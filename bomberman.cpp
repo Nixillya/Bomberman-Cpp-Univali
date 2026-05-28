@@ -530,7 +530,9 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
             if(map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X] == explosionBlock){
                 if(enemys[enemy].Pos.Y != -1 && enemys[enemy].Pos.X != -1){
                     player.Points += 250 * combo;
-                    combo+=0.333333333333333333333333333333333333333333333333333333334;
+                    if(info.phase!=3){
+                        combo+=1/3;
+                    }
                     enemys[enemy].Pos.Y = -1;
                     enemys[enemy].Pos.X = -1;
                     if(boss.HP>1){
@@ -576,28 +578,30 @@ void lost_life(InfoType info, PlayerType &player, int &moveEnemy, int &timerCloc
     }
 }
 
-int player_verifier(InfoType info, int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType &boss){
+int player_verifier(InfoType info,PositionType portal, int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType &boss){
     int sound = 0;
-    if(map[player.Pos.Y][player.Pos.X] == explosionBlock && player.Invincible == 0){
-        if(player.Item==5){
-            lost_life(info, player, moveEnemy, timerClock);
-            player.Item = 0;
-            if(player.Slot==4){
-                player.Slot = 0;
+    if(portal.Pos.Y==-1 && portal.Pos.X==-1){
+        if(map[player.Pos.Y][player.Pos.X] == explosionBlock && player.Invincible == 0){
+            if(player.Item==5){
+                lost_life(info, player, moveEnemy, timerClock);
+                player.Item = 0;
+                if(player.Slot==4){
+                    player.Slot = 0;
+                }
             }
-        }
-        lost_life(info, player, moveEnemy, timerClock);
-        sound = 1;
-    }
-    if(player.Item!=5){
-        if((player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X) && player.Invincible == 0){
             lost_life(info, player, moveEnemy, timerClock);
             sound = 1;
         }
-        for(int enemy = 0; enemy < enemysQuantity; enemy++){
-            if ((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) && player.Invincible == 0){
+        if(player.Item!=5){
+            if((player.Pos.Y==boss.Pos.Y && player.Pos.X==boss.Pos.X) && player.Invincible == 0){
                 lost_life(info, player, moveEnemy, timerClock);
                 sound = 1;
+            }
+            for(int enemy = 0; enemy < enemysQuantity; enemy++){
+                if ((player.Pos.Y == enemys[enemy].Pos.Y && player.Pos.X == enemys[enemy].Pos.X) && player.Invincible == 0){
+                    lost_life(info, player, moveEnemy, timerClock);
+                    sound = 1;
+                }
             }
         }
     }
@@ -652,7 +656,7 @@ int player_verifier(InfoType info, int enemysQuantity, PlayerType &player, Enemy
         }
     }
     if(player.Item == 5){
-        int combo = 1;
+        double combo = 1;
         int success = false;
         if(player.Pos.Y == boss.Pos.Y && player.Pos.X == boss.Pos.X){
             player.Item = 0;
@@ -674,7 +678,9 @@ int player_verifier(InfoType info, int enemysQuantity, PlayerType &player, Enemy
                     enemys[enemy].Pos.Y = -1;
                     enemys[enemy].Pos.X = -1;
                     player.Points += 250 * combo;
-                    combo+=0.333333333333333333333333333333333333333333333333333333334;
+                    if(info.phase!=3){
+                        combo+=1/3;
+                    }
                     if(boss.Alive){
                         if(boss.HP>1){
                             boss.HP--;
@@ -695,7 +701,9 @@ int player_verifier(InfoType info, int enemysQuantity, PlayerType &player, Enemy
                                 enemys[enemy].Pos.Y = -1;
                                 enemys[enemy].Pos.X = -1;
                                 player.Points += 250 * combo;
-                                combo+=0.333333333333333333333333333333333333333333333333333333334;
+                                if(info.phase!=3){
+                                    combo+=1/3;
+                                }
                                 if(boss.Alive){
                                     if(boss.HP>1){
                                         boss.HP--;
@@ -1297,10 +1305,10 @@ int game(InfoType &info){
         sound1 = 0;
         sound2 = 0;
         if(player1.Alive){
-            sound1 = player_verifier(info, enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+            sound1 = player_verifier(info, portal, enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
         }
         if(player2.Alive){
-            sound2 = player_verifier(info, enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+            sound2 = player_verifier(info, portal, enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
         }
         if(sound1==1 || sound2==1){
             perdeuVidaSD.play();
@@ -2502,16 +2510,47 @@ int main(){
                                 break;
 
                                 case 5:
-                                    new_line("┏","━","┓",80);
-                                    cout << "┃ - Objetivo: Exploda todos os inimigos da fase, após isso, o portal para a      ┃\n";
-                                    cout << "┃   próxima fase será aberta. São 3 fases ao total, com a última fase tendo      ┃\n";
-                                    cout << "┃   um Chefão te esperando.                                                      ┃\n";
-                                    cout << "┃ - Você começa apenas com uma vida, colete Vidas Extras para, bem, não morrer   ┃\n";
-                                    cout << "┃   quando levar dano.                                                           ┃\n";
-                                    cout << "┃ - Você pode só pode colocar um explosivo por vez, colete Multi-Detonares para  ┃\n";
-                                    cout << "┃   poder colocar mais explosivos.                                               ┃\n";
-                                    cout << "┃ - Ao colocar uma explosivo, não dá para passar por ela.                        ┃\n";
-                                    cout << "┃ - As bombas conseguem destruir paredes frageis, mas não as solidas.            ┃\n";
+                                    cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ OBJETIVO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n";
+                                    cout << "┃                                                                                ┃\n";
+                                    cout << "┃ - Exploda todos os inimigos da fase e tente ganhar o maximo de pontos possivel ┃\n";
+                                    cout << "┃   após isso, o portal para a próxima fase será aberta.                         ┃\n";
+                                    cout << "┃ - São 3 fases ao total, tendo na 3 fase um Chefão te esperando.                ┃\n";
+                                    cout << "┃                                                                                ┃\n";
+                                    cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ GERAÇÃO DO MAPA ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
+                                    cout << "┃                                                                                ┃\n";
+                                    cout << "┃ - O mapa é gerado com bordas de paredes solidas.                               ┃\n";
+                                    cout << "┃ - No meio da fase sempre vai ter um padrão de paredes solidas.                 ┃\n";
+                                    cout << "┃      As vezes alguma parede solida do meio pode ser uma parede fragil.         ┃\n";
+                                    cout << "┃ - As paredes frageis só são geradas do lado de uma parede solida ou fragil.    ┃\n";
+                                    cout << "┃      O maximo de paredes fragil que podem ser geradas é de 50.                 ┃\n";        
+                                    cout << "┃ - As melhorias são geradas abaixo das paredes fragil.                          ┃\n";
+                                    cout << "┃      cada parede fragil tem 1/4 de chance de ter uma melhoria.                 ┃\n";
+                                    cout << "┃ - Os inimigos são gerados aleatoriamente no mapa até a fase 2.                 ┃\n";
+                                    cout << "┃ - O jogador sempre vai ser gerado numa areá possivelmente segura.              ┃\n";
+                                    cout << "┃ - O Jogador2 sempre vai ser gerado com o jogador1.                             ┃\n";
+                                    cout << "┃                                                                                ┃\n";
+                                    cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ INIMIGOS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
+                                    cout << "┃                                                                                ┃\n";
+                                    cout << "┃ - Os inimigos se movem aleatoriamente no modo fácil,                           ┃\n";
+                                    cout << "┃   no médio 50% dos movimentos vão para o jogador,                              ┃\n";
+                                    cout << "┃   no difícil 75% dos movimentos vão para o jogador,                            ┃\n";
+                                    cout << "┃ - Os inimigos podem destruir melhorias ao passar por cima delas.               ┃\n";
+                                    cout << "┃ - Os inimigos se movem aleatoriamente quando existe uma bomba no mapa.         ┃\n";
+                                    cout << "┃                                                                                ┃\n";
+                                    cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ CHEFÃO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
+                                    cout << "┃                                                                                ┃\n";
+                                    cout << "┃ - A fase do boss é diferente do padrão, tendo no meio paredes frageis.         ┃\n";
+                                    cout << "┃ - O boss se comporta de acordo com sua vida.                                   ┃\n";
+                                    cout << "┃ - ele pode avançar para a posição do jogador.                                  ┃\n";
+                                    cout << "┃ - ele pode gerar inimigos.                                                     ┃\n";
+                                    cout << "┃ - ele pode quebrar paredes frageis ou trasnforma-lá em solida e vice-versa.    ┃\n";
+                                    cout << "┃ - ele tem 10 de vida no fácil. 15 no médio. 25 no difícil.                     ┃\n";
+                                    cout << "┃ - ele pode quebrar paredes frageis ou trasnforma-lá em solida e vice-versa.    ┃\n";
+                                    cout << "┃ - Ao matar um inimigo ele recebe 1 de dano mesmo se tiver shield.              ┃\n";
+                                    cout << "┃ - Se ele for atingido por uma bomba, ele pode receber mais dano.               ┃\n";
+                                    cout << "┃      mas se tiver shield é necessario quebra-lo primeiro.                      ┃\n";
+                                    cout << "┃ - Quando ele pegar uma melhoria ele recebe 2 de shield.                        ┃\n";
+                                    cout << "┃      Caso um inimigo pegue, ele recebe apenas 1 shield.                        ┃\n";
                                     cout << "┃                                                                                ┃\n";
                                     cout << "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ PONTUAÇÂO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n";
                                     cout << "┃                                                                                ┃\n";
@@ -2522,10 +2561,12 @@ int main(){
                                     cout << "┃      Matar mais de um inimigo ao mesmo tempo aumenta o combo em 0.33...        ┃\n";
                                     cout << "┃      A pontuação é multiplicada pelo combo para cada inimigo morto             ┃\n";
                                     cout << "┃      Calculo aproximado: (250*1)+(250*1,33..)+(250*1,66..)+(250*2)...          ┃\n";
+                                    cout << "┃      O combo para de funcionar na fase do boss.                                ┃\n";            
                                     cout << "┃ - Causar dano ao Chefão = +500 pontos.                                         ┃\n";
                                     cout << "┃      Se 2 players estiverem vivos = +250 pontos (para ambos).                  ┃\n";
-                                    cout << "┃ - Perder Vida = -250 pontos.                                                   ┃\n";
-                                    cout << "┃ - Colocar uma bomba = -10 pontos.                                              ┃\n";
+                                    cout << "┃ - Perder vida = -250 pontos.                                                   ┃\n";
+                                    cout << "┃ - Perder vida na fase do boss = -500 pontos.                                   ┃\n";
+                                    cout << "┃ - Colocar uma bomba = -10 pontos.                                              ┃\n";        
                                     new_line("┗","━","┛",80);
                                     getch();
                                     cout << "\ec";
