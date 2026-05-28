@@ -1134,9 +1134,9 @@ int game(InfoType &info){
                             }
                         }else{
                             if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
-                                cout << "\e[0;43m\e[38;5;53m\u25A1";
+                                cout << "\e[0;43m\e[38;5;17m\u25A1";
                             }else{
-                                cout << "\e[0;42m\e[38;5;53m\u25A0"; // BOSS CONGELADO
+                                cout << "\e[0;42m\e[38;5;17m\u25A0"; // BOSS CONGELADO
                             }
                         }
 
