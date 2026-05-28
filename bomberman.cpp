@@ -2313,7 +2313,6 @@ int main(){
                         musicaDerrotaSD.stop();
                         cout<<"\ec\e[?25l";
                         int deadMenu = -1;
-                        info.phase = 3;
                         if(game(info)){
                             if(info.phase>3){
                                 info.maxPoints = info.player1.Points+info.player2.Points;
