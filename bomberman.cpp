@@ -1583,6 +1583,9 @@ int game(InfoType &info){
                 if(portal.Pos.Y!=-1 && portal.Pos.X!=-1){
                     priority = 3;
                 }
+                if(player1.Invincible>0){
+                    priority = 0;
+                }
                 int safes = 0;
                 for(int i=0;i<4;i++){
                     safes += (danger[i]==-1) ? 1 : 0;
