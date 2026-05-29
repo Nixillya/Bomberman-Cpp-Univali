@@ -1506,51 +1506,53 @@ int game(InfoType &info){
                                     found_danger(danger,y,x);
                                 }
                             }
-                            for(int enemy=0;enemy<enemysQuantity;enemy++){
-                                if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
-                                    found_danger(danger,y,x);
-                                    putBomb = true;
+                            if(player1.Item!=5){
+                                for(int enemy=0;enemy<enemysQuantity;enemy++){
+                                    if((player1.Pos.Y+y == enemys[enemy].Pos.Y && player1.Pos.X+x == enemys[enemy].Pos.X)){
+                                        found_danger(danger,y,x);
+                                        putBomb = true;
+                                    }
+                                    int Y = 0;
+                                    int X = 0;
+                                    if(enemys[enemy].Move == 1){
+                                        Y--;
+                                    }
+                                    if(enemys[enemy].Move == 2){
+                                        Y++;
+                                    }
+                                    if(enemys[enemy].Move == 3){
+                                        X--;
+                                    }
+                                    if(enemys[enemy].Move == 4){
+                                        X++;
+                                    }
+                                    if(((player1.Pos.Y+y == enemys[enemy].Pos.Y+Y && player1.Pos.X+x == enemys[enemy].Pos.X+X) && freezeEnemys==0)){
+                                        putBomb = true;
+                                        found_danger(danger,y,x);
+                                    }
                                 }
-                                int Y = 0;
-                                int X = 0;
-                                if(enemys[enemy].Move == 1){
-                                    Y--;
-                                }
-                                if(enemys[enemy].Move == 2){
-                                    Y++;
-                                }
-                                if(enemys[enemy].Move == 3){
-                                    X--;
-                                }
-                                if(enemys[enemy].Move == 4){
-                                    X++;
-                                }
-                                if(((player1.Pos.Y+y == enemys[enemy].Pos.Y+Y && player1.Pos.X+x == enemys[enemy].Pos.X+X) && freezeEnemys==0)){
-                                    putBomb = true;
-                                    found_danger(danger,y,x);
-                                }
-                            }
-                            if(boss.Alive){
-                                if((player1.Pos.Y+y == boss.Pos.Y && player1.Pos.X+x == boss.Pos.X)){
-                                    found_danger(danger,y,x);
-                                    putBomb = true;
-                                }
-                                int Y = 0;
-                                int X = 0;
-                                if(boss.Move == 1){
-                                    Y++;
-                                }
-                                if(boss.Move == 2){
-                                    Y--;
-                                }
-                                if(boss.Move == 3){
-                                    X++;
-                                }
-                                if(boss.Move == 4){
-                                    X--;
-                                }
-                                if(((player1.Pos.Y+y == boss.Pos.Y+Y && player1.Pos.X+x == boss.Pos.X+X))){
-                                    found_danger(danger,y,x);
+                                if(boss.Alive){
+                                    if((player1.Pos.Y+y == boss.Pos.Y && player1.Pos.X+x == boss.Pos.X)){
+                                        found_danger(danger,y,x);
+                                        putBomb = true;
+                                    }
+                                    int Y = 0;
+                                    int X = 0;
+                                    if(boss.Move == 1){
+                                        Y++;
+                                    }
+                                    if(boss.Move == 2){
+                                        Y--;
+                                    }
+                                    if(boss.Move == 3){
+                                        X++;
+                                    }
+                                    if(boss.Move == 4){
+                                        X--;
+                                    }
+                                    if(((player1.Pos.Y+y == boss.Pos.Y+Y && player1.Pos.X+x == boss.Pos.X+X))){
+                                        found_danger(danger,y,x);
+                                    }
                                 }
                             }
                             int safes = 0;
