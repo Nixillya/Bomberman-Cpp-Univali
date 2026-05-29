@@ -1186,165 +1186,167 @@ int game(InfoType &info){
         info.player2.TotalMoves = player2.TotalMoves;
 
         cout << "\e[?25l\e[1;1H";
-        new_line("┏","━","┓",mapSizeX);
-        for (int y = 0; y < mapSizeY; y++) {
-            cout<<"┃";
-            for (int x = 0; x < mapSizeX; x++) {
-                 bool block = true;
-                if(block){
-                    if(portal.Pos.Y==y && portal.Pos.X==x){
-                        if(map[y][x] == freeBlock){
-                            if(rand()%2){
-                                cout << "\e[32;42m\e[38;5;93m\u25CF";
-                                continue;
-                            }else{
-                                cout << "\e[32;42m\e[38;5;207m\u25CF";
-                                continue;
-                            }
-                        }
-                    }
-                }
-                 if(block){
-                    if(y==boss.Pos.Y && x==boss.Pos.X){
-                        block = false;
-                        if(freezeEnemys-2<=0){
-                            if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
-                                cout << "\e[0;43m\e[38;5;90m\u25A1";
-                            }else{
-                                cout << "\e[0;42m\e[38;5;90m\u25A0"; // BOSS
-                            }
-                        }else{
-                            if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
-                                cout << "\e[0;43m\e[38;5;17m\u25A1";
-                            }else{
-                                cout << "\e[0;42m\e[38;5;17m\u25A0"; // BOSS CONGELADO
-                            }
-                        }
-
-                    }
-                 }
-                 if(block){
-                    for(int enemy=0; enemy<enemysQuantity; enemy++) {
-                        if(y==enemys[enemy].Pos.Y && x==enemys[enemy].Pos.X) {
-                            block = false;
-                            if(map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X]==explosionBlock) { // Testa se naquela posição tem um bloco de explosão
-                                if(freezeEnemys==0){
-                                    cout << "\e[31;43m\u25A1"; // INIMIGO MORTO NA EXPLOSÃO
-                                    break;
+        if(player1.Alive || player2.Alive){
+            new_line("┏","━","┓",mapSizeX);
+            for(int y = 0; y < mapSizeY; y++){
+                cout<<"┃";
+                for (int x = 0; x < mapSizeX; x++) {
+                    bool block = true;
+                    if(block){
+                        if(portal.Pos.Y==y && portal.Pos.X==x){
+                            if(map[y][x] == freeBlock){
+                                if(rand()%2){
+                                    cout << "\e[32;42m\e[38;5;93m\u25CF";
+                                    continue;
                                 }else{
-                                    cout << "\e[31;43m\e[38;5;52m\u25A1"; // INIMIGO MORTO NA EXPLOSÃO CONGELADO
-                                    break;
+                                    cout << "\e[32;42m\e[38;5;207m\u25CF";
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                    if(block){
+                        if(y==boss.Pos.Y && x==boss.Pos.X){
+                            block = false;
+                            if(freezeEnemys-2<=0){
+                                if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
+                                    cout << "\e[0;43m\e[38;5;90m\u25A1";
+                                }else{
+                                    cout << "\e[0;42m\e[38;5;90m\u25A0"; // BOSS
                                 }
                             }else{
-                                if((player1.Pos.Y==enemys[enemy].Pos.Y && player1.Pos.X==enemys[enemy].Pos.X) || (player2.Pos.Y==enemys[enemy].Pos.Y && player2.Pos.X==enemys[enemy].Pos.X)) {
-                                    cout << "\e[31;42m\u25CB"; // PLAYER MORTO NO INIMIGO
-                                    break;
+                                if(map[boss.Pos.Y][boss.Pos.X] == explosionBlock){
+                                    cout << "\e[0;43m\e[38;5;17m\u25A1";
                                 }else{
+                                    cout << "\e[0;42m\e[38;5;17m\u25A0"; // BOSS CONGELADO
+                                }
+                            }
+
+                        }
+                    }
+                    if(block){
+                        for(int enemy=0; enemy<enemysQuantity; enemy++) {
+                            if(y==enemys[enemy].Pos.Y && x==enemys[enemy].Pos.X) {
+                                block = false;
+                                if(map[enemys[enemy].Pos.Y][enemys[enemy].Pos.X]==explosionBlock) { // Testa se naquela posição tem um bloco de explosão
                                     if(freezeEnemys==0){
-                                        cout << "\e[31;42m\u25A0"; // INIMIGO
+                                        cout << "\e[31;43m\u25A1"; // INIMIGO MORTO NA EXPLOSÃO
                                         break;
                                     }else{
-                                        cout << "\e[31;42m\e[38;5;52m\u25A0"; // INIMIGO CONGELADO
+                                        cout << "\e[31;43m\e[38;5;52m\u25A1"; // INIMIGO MORTO NA EXPLOSÃO CONGELADO
                                         break;
+                                    }
+                                }else{
+                                    if((player1.Pos.Y==enemys[enemy].Pos.Y && player1.Pos.X==enemys[enemy].Pos.X) || (player2.Pos.Y==enemys[enemy].Pos.Y && player2.Pos.X==enemys[enemy].Pos.X)) {
+                                        cout << "\e[31;42m\u25CB"; // PLAYER MORTO NO INIMIGO
+                                        break;
+                                    }else{
+                                        if(freezeEnemys==0){
+                                            cout << "\e[31;42m\u25A0"; // INIMIGO
+                                            break;
+                                        }else{
+                                            cout << "\e[31;42m\e[38;5;52m\u25A0"; // INIMIGO CONGELADO
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                if(block){
-                    if (player1.Pos.Y == y && player1.Pos.X == x) {
-                        block = false;
-                        if(map[player1.Pos.Y][player1.Pos.X] == explosionBlock){
-                            cout << "\e[97;43m\e[38;5;255m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
-                        }else{
-                            if(player1.Invincible==0){
-                                if(map[player1.Pos.Y][player1.Pos.X] == fragileBlock){
-                                    cout << "\e[48;5;245m\e[38;5;255m\u25CF"; // PLAYER
-                                }else{
-                                    cout << "\e[0;42m\e[38;5;255m\u25CF"; // PLAYER
-                                }
+                    if(block){
+                        if (player1.Pos.Y == y && player1.Pos.X == x) {
+                            block = false;
+                            if(map[player1.Pos.Y][player1.Pos.X] == explosionBlock){
+                                cout << "\e[97;43m\e[38;5;255m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
                             }else{
-                                if(swaper<int>(1)==1){
-                                    cout << "\e[0;42m\e[38;5;255m\u25CF"; // PLAYER
+                                if(player1.Invincible==0){
+                                    if(map[player1.Pos.Y][player1.Pos.X] == fragileBlock){
+                                        cout << "\e[48;5;245m\e[38;5;255m\u25CF"; // PLAYER
+                                    }else{
+                                        cout << "\e[0;42m\e[38;5;255m\u25CF"; // PLAYER
+                                    }
                                 }else{
-                                    cout << "\e[32;42m ";
+                                    if(swaper<int>(1)==1){
+                                        cout << "\e[0;42m\e[38;5;255m\u25CF"; // PLAYER
+                                    }else{
+                                        cout << "\e[32;42m ";
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if(block){
-                    if (player2.Pos.Y == y && player2.Pos.X == x) {
-                        block = false;
-                        if(map[player2.Pos.Y][player2.Pos.X] == explosionBlock){
-                            cout << "\e[97;43m\e[38;5;0m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
-                        }else{
-                            if(player2.Invincible==0){
-                                if(map[player2.Pos.Y][player2.Pos.X] == fragileBlock){
-                                        cout << "\e[48;5;245m\e[38;5;0m\u25CF"; // PLAYER
-                                }else{
-                                    cout << "\e[0;42m\e[38;5;0m\u25CF"; // PLAYER
-                                }
+                    if(block){
+                        if (player2.Pos.Y == y && player2.Pos.X == x) {
+                            block = false;
+                            if(map[player2.Pos.Y][player2.Pos.X] == explosionBlock){
+                                cout << "\e[97;43m\e[38;5;0m\u25CB"; // PLAYER MORTO NA EXPLOSÃO
                             }else{
-                                if(swaper<double>(2)==1){
-                                    cout << "\e[0;42m\e[38;5;0m\u25CF"; // PLAYER
+                                if(player2.Invincible==0){
+                                    if(map[player2.Pos.Y][player2.Pos.X] == fragileBlock){
+                                            cout << "\e[48;5;245m\e[38;5;0m\u25CF"; // PLAYER
+                                    }else{
+                                        cout << "\e[0;42m\e[38;5;0m\u25CF"; // PLAYER
+                                    }
                                 }else{
-                                    cout << "\e[32;42m ";
+                                    if(swaper<double>(2)==1){
+                                        cout << "\e[0;42m\e[38;5;0m\u25CF"; // PLAYER
+                                    }else{
+                                        cout << "\e[32;42m ";
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if(block){
-                    if(map[y][x] == explosionBlock){
-                        cout << "\e[33;43m "; // EXPLOSÃO
-                        block = false;
-                        continue;
+                    if(block){
+                        if(map[y][x] == explosionBlock){
+                            cout << "\e[33;43m "; // EXPLOSÃO
+                            block = false;
+                            continue;
+                        }
                     }
-                }
-                if(block){
-                    for(int box=0; box<fragileWallQuantity; box++){
-                        if(boxs[box].Pos.Y==y && boxs[box].Pos.X==x){
-                            if(map[y][x] == freeBlock){
-                                if(rand()%2){
-                                    cout<<"\e[32;42m\e[38;5;3m\u25CF";
-                                }else{
-                                    cout<<"\e[32;42m\e[38;5;208m\u25CF";
+                    if(block){
+                        for(int box=0; box<fragileWallQuantity; box++){
+                            if(boxs[box].Pos.Y==y && boxs[box].Pos.X==x){
+                                if(map[y][x] == freeBlock){
+                                    if(rand()%2){
+                                        cout<<"\e[32;42m\e[38;5;3m\u25CF";
+                                    }else{
+                                        cout<<"\e[32;42m\e[38;5;208m\u25CF";
+                                    }
+                                    block = false;
+                                    continue;
                                 }
-                                block = false;
+                            }
+                        }
+                    }
+                    if (block) {
+                        if (map[y][x] == freeBlock){
+                            cout << "\e[32;42m "; // AREÁ LIVRE
+                            continue;
+                        }
+                        if (map[y][x] == solidBlock){
+                            cout << "\e[48;5;243m "; // PAREDE SOLIDA
+                            continue;
+                        }
+                        if (map[y][x] == fragileBlock){
+                            cout << "\e[48;5;245m "; // PAREDE FRAGIL
+                            continue;
+                        }
+                        if (map[y][x] == bombBlock){
+                            if(rand()%2){
+                                cout << "\e[30;42m\u25C9"; // BOMBA
+                                continue;
+                            }else{
+                                cout << "\e[33;42m\u25C9"; // BOMBA
                                 continue;
                             }
                         }
                     }
                 }
-                if (block) {
-                    if (map[y][x] == freeBlock){
-                        cout << "\e[32;42m "; // AREÁ LIVRE
-                        continue;
-                    }
-                    if (map[y][x] == solidBlock){
-                        cout << "\e[48;5;243m "; // PAREDE SOLIDA
-                        continue;
-                    }
-                    if (map[y][x] == fragileBlock){
-                        cout << "\e[48;5;245m "; // PAREDE FRAGIL
-                        continue;
-                    }
-                    if (map[y][x] == bombBlock){
-                        if(rand()%2){
-                            cout << "\e[30;42m\u25C9"; // BOMBA
-                            continue;
-                        }else{
-                            cout << "\e[33;42m\u25C9"; // BOMBA
-                            continue;
-                        }
-                    }
-                }
+                cout << "\e[0m┃\n";
             }
-            cout << "\e[0m┃\n";
+            new_line("┗","━","┛",mapSizeX);
         }
-        new_line("┗","━","┛",mapSizeX);
         render_details(info,player1,player2,boss);
 //---------------------------< RENDERIZAÇÃO DO MAPA <---------------------------//
 
