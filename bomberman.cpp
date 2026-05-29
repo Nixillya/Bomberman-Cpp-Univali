@@ -60,6 +60,7 @@ struct PlayerType{
     int Totalbombs = 0;
     int Points = 1000;
     bool Alive = true;
+    bool Passed = false;
 };
 
 struct TimerType{
@@ -512,17 +513,21 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
         map[bombs[bomb].Pos.Y][bombs[bomb].Pos.X] = explosionBlock;
         if(bombs[bomb].Range==2000){
             explode_pandora(map,bombs[bomb],player,otherPlayer,enemys,enemysQuantity,boss);
+            sound = 3;
         }else{
             explode(map, bombs[bomb], 1, 0);
             explode(map, bombs[bomb], 0, 1);
             explode(map, bombs[bomb], -1, 0);
             explode(map, bombs[bomb], 0, -1);
+            sound = 1;
+            if(bombs[bomb].Range==1000){
+                sound = 4;
+            }
         }
         explosions[bomb] = bombs[bomb];
         bombs[bomb].Pos.Y = -1;
         bombs[bomb].Pos.X = -1;
         bombs[bomb].Time = 0;
-        sound = 1;
     }
     if (explosions[bomb].Pos.Y > 0 && explosions[bomb].Pos.X > 0 && ((clock() - explosions[bomb].Time) >= 1350)){
         double combo = 1;
@@ -559,7 +564,7 @@ int bombs_explosion(InfoType info,BossType &boss,BombType bombs[], int bomb, Pla
 void lost_life(InfoType info, PlayerType &player, int &moveEnemy, int &timerClock){
     player.Lifes--;
     player.Slot = 5;
-    if (player.Lifes >= 1){
+    if (player.Lifes>0){
         player.Points -= 250;
         if(info.phase==3){
             player.Points -= 250;
@@ -570,16 +575,18 @@ void lost_life(InfoType info, PlayerType &player, int &moveEnemy, int &timerCloc
         timerClock = clock();
         player.Item = 0;
         player.Invincible = 1;
-    }
-    else{
-        player.Pos.Y = -2;
-        player.Pos.X = -2;
+    }else{
         player.Alive = false;
     }
 }
 
 int player_verifier(InfoType info,PositionType portal, int enemysQuantity, PlayerType &player, EnemyType enemys[], int &freezeEnemys, int &timerClock, int map[mapSizeY][mapSizeX], int &moveEnemy, int fragileWallQuantity, PositionType boxs[], BossType &boss){
     int sound = 0;
+    if(player.Pos.Y == portal.Pos.Y && player.Pos.X == portal.Pos.X){
+        player.Passed = true;
+        player.Pos.Y = -2;
+        player.Pos.X = -2;
+    }
     if(portal.Pos.Y==-1 && portal.Pos.X==-1){
         if(map[player.Pos.Y][player.Pos.X] == explosionBlock && player.Invincible == 0){
             if(player.Item==5){
@@ -633,6 +640,9 @@ int player_verifier(InfoType info,PositionType portal, int enemysQuantity, Playe
                         player.Item = item;
                         if(player.Item == 2){
                             sound = 4;
+                        }
+                        if(player.Item == 5){
+                            sound = 6;
                         }
                         success = true;
                     }
@@ -725,28 +735,29 @@ int player_verifier(InfoType info,PositionType portal, int enemysQuantity, Playe
 }
 
 void player_action(PlayerType &player,PlayerType &otherPlayer, PositionType &target, BombType bombs[],int map[mapSizeY][mapSizeX],PositionType portal, bool putBomb){
-    if((map[player.Pos.Y][player.Pos.X] != freeBlock && map[player.Pos.Y][player.Pos.X] != explosionBlock) || (player.Pos.Y==otherPlayer.Pos.Y && player.Pos.X==otherPlayer.Pos.X)){ // Testa colisão e cancela o movimento se verdadeiro
-        if(player.Item == 2 && player.Invincible == 0 && map[player.Pos.Y][player.Pos.X] == fragileBlock && !(player.Pos.Y==otherPlayer.Pos.Y && player.Pos.X==otherPlayer.Pos.X)){
-            if(rand()%10==0){
-                player.Item = 0;
-                player.Slot = 0;
-                for(int y=-1;y<=1;y++){
-                    for(int x=-1;x<=1;x++){
-                        if(y==0 || x==0){
-                            if(map[player.Pos.Y+y][player.Pos.X+x] == fragileBlock){
-                                map[player.Pos.Y+y][player.Pos.X+x] = freeBlock;
+    if(target.Pos.Y!=0 || target.Pos.X!=0){
+        if(map[player.Pos.Y][player.Pos.X] != freeBlock || (player.Pos.Y==otherPlayer.Pos.Y && player.Pos.X==otherPlayer.Pos.X)){ // Testa colisão e cancela o movimento se verdadeiro
+            if(player.Item == 2 && player.Invincible == 0 && map[player.Pos.Y][player.Pos.X] == fragileBlock && !(player.Pos.Y==otherPlayer.Pos.Y && player.Pos.X==otherPlayer.Pos.X)){
+                if(rand()%10==0){
+                    player.Item = 0;
+                    player.Slot = 0;
+                    for(int y=-1;y<=1;y++){
+                        for(int x=-1;x<=1;x++){
+                            if(y==0 || x==0){
+                                if(map[player.Pos.Y+y][player.Pos.X+x] == fragileBlock){
+                                    map[player.Pos.Y+y][player.Pos.X+x] = freeBlock;
+                                }
                             }
                         }
                     }
                 }
+            }else{
+                player.Pos.Y -= target.Pos.Y;
+                player.Pos.X -= target.Pos.X;
             }
         }else{
-            player.Pos.Y -= target.Pos.Y;
-            player.Pos.X -= target.Pos.X;
+            player.TotalMoves++;
         }
-    }
-    else{
-        player.TotalMoves++;
     }
     if(putBomb){
         player.Totalbombs++;
@@ -802,6 +813,11 @@ int game(InfoType &info){
     int sound1 = 0;
     int sound2 = 0;
 
+    SoundBuffer aegisBF;
+    if(!aegisBF.loadFromFile("Sounds/aegis.wav")){}
+    Sound aegisSD(aegisBF);
+    aegisSD.setVolume(50);
+
     SoundBuffer ampulhetaBF;
     if(!ampulhetaBF.loadFromFile("Sounds/ampulheta.wav")){}
     Sound ampulhetaSD(ampulhetaBF);
@@ -832,6 +848,16 @@ int game(InfoType &info){
     musicaFaseSD.setLooping(true);
     musicaFaseSD.setVolume(25);
     musicaFaseSD.play();
+
+    SoundBuffer om3gaBF;
+    if(!om3gaBF.loadFromFile("Sounds/OM3GA.wav")){}
+    Sound om3gaSD(om3gaBF);
+    om3gaSD.setVolume(30);
+
+    SoundBuffer pandoraBF;
+    if(!pandoraBF.loadFromFile("Sounds/pandora.wav")){}
+    Sound pandoraSD(pandoraBF);
+    pandoraSD.setVolume(30);
 
     SoundBuffer pegandoLootBF;
     if(!pegandoLootBF.loadFromFile("Sounds/pegando_loot.wav")){}
@@ -1066,9 +1092,39 @@ int game(InfoType &info){
         player1.Pos.X = -2;
         player1.Alive = false;
     }
-    if(info.players==3 && player2.Alive){
-        player2.Pos.Y = player1.Pos.Y;
-        player2.Pos.X = player1.Pos.X;
+    if(info.players==3){
+        if(player1.Alive){
+            player2.Pos.Y = player1.Pos.Y;
+            player2.Pos.X = player1.Pos.X;
+        }else{
+            if(player2.Alive){
+                while(true){
+                    bool success = false;
+                    player2.Pos.Y = rand()%mapSizeY;
+                    player2.Pos.X = rand()%mapSizeX;
+                    if (map[player2.Pos.Y][player2.Pos.X] == freeBlock){ // Verifica se a posição do player1 é uma area livre, se for, ele faz uma verificação para não gerar o player1 perto de paredes frageis
+                        success = true;
+                        for (int y = -1; y < 2; y++){
+                            for (int x = -1; x < 2; x++){ // Passa por uma matriz 3x3 em volta do player1
+                                if(y==0 || x==0){ // Verifica se tem uma parede fragil em volta do player1, se tiver, ele gera outra posição
+                                    if (map[player2.Pos.Y+y][player2.Pos.X+x] == fragileBlock){
+                                        success = false;
+                                    }
+                                    for(int enemy = 0; enemy < enemysQuantity; enemy++){
+                                        if(player2.Pos.Y+y == enemys[enemy].Pos.Y && player2.Pos.X+x == enemys[enemy].Pos.X){
+                                            success = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(success){
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }else{
         player2.Pos.Y = -2;
         player2.Pos.X = -2;
@@ -1135,6 +1191,19 @@ int game(InfoType &info){
             cout<<"┃";
             for (int x = 0; x < mapSizeX; x++) {
                  bool block = true;
+                if(block){
+                    if(portal.Pos.Y==y && portal.Pos.X==x){
+                        if(map[y][x] == freeBlock){
+                            if(rand()%2){
+                                cout << "\e[32;42m\e[38;5;93m\u25CF";
+                                continue;
+                            }else{
+                                cout << "\e[32;42m\e[38;5;207m\u25CF";
+                                continue;
+                            }
+                        }
+                    }
+                }
                  if(block){
                     if(y==boss.Pos.Y && x==boss.Pos.X){
                         block = false;
@@ -1235,19 +1304,6 @@ int game(InfoType &info){
                     }
                 }
                 if(block){
-                    if(portal.Pos.Y==y && portal.Pos.X==x){
-                        if(map[y][x] == freeBlock){
-                            if(rand()%2){
-                                cout << "\e[32;42m\e[38;5;93m\u25CF";
-                                continue;
-                            }else{
-                                cout << "\e[32;42m\e[38;5;207m\u25CF";
-                                continue;
-                            }
-                        }
-                    }
-                }
-                if(block){
                     for(int box=0; box<fragileWallQuantity; box++){
                         if(boxs[box].Pos.Y==y && boxs[box].Pos.X==x){
                             if(map[y][x] == freeBlock){
@@ -1302,7 +1358,7 @@ int game(InfoType &info){
         if(!player2.Alive){
             player2.Points = 0;
         }
-        if((player1.Pos.Y == portal.Pos.Y && player1.Pos.X == portal.Pos.X) || (player2.Pos.Y == portal.Pos.Y && player2.Pos.X == portal.Pos.X)){
+        if((player1.Passed || !player1.Alive) && (player2.Passed || !player2.Alive)){
             info.phase++;
             return 1;
         }
@@ -1310,9 +1366,19 @@ int game(InfoType &info){
         sound2 = 0;
         if(player1.Alive){
             sound1 = player_verifier(info, portal, enemysQuantity, player1, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+        }else{
+            if(map[player1.Pos.Y][player1.Pos.X] != explosionBlock){
+                player1.Pos.Y = -2;
+                player1.Pos.X = -2;
+            }
         }
         if(player2.Alive){
             sound2 = player_verifier(info, portal, enemysQuantity, player2, enemys, freezeEnemys, timerClock, map, moveEnemy, fragileWallQuantity, boxs, boss);
+        }else{
+            if(map[player2.Pos.Y][player2.Pos.X] != explosionBlock){
+                player2.Pos.Y = -2;
+                player2.Pos.X = -2;
+            }
         }
         if(sound1==1 || sound2==1){
             perdeuVidaSD.play();
@@ -1328,6 +1394,9 @@ int game(InfoType &info){
         }
         if(sound1 == 5 || sound2 == 5){
             morteInimigoSD.play();
+        }
+        if(sound1 == 6 || sound2 == 6){
+            aegisSD.play();
         }
 
         if (kbhit() || info.players==1){
@@ -1578,7 +1647,7 @@ int game(InfoType &info){
                 }
             }
 //----------------------< CPU PLAYER <----------------------//
-            if(player1.Alive){
+            if(player1.Alive && !player1.Passed){
                 switch(key){
                     case 119: // Cima
                         target1.Pos.Y--;
@@ -1593,8 +1662,19 @@ int game(InfoType &info){
                         target1.Pos.X++;
                         break;
                 }
+                player1.Pos.Y += target1.Pos.Y;
+                player1.Pos.X += target1.Pos.X;
+                if(key==119 || key==115 || key==97 || key==100 || key==32){
+                    int putBomb = false;
+                    if(key==32 && (map[player1.Pos.Y][player1.Pos.X] == freeBlock) && player1.Invincible == 0 && (bombs1[player1.ActualBomb].Pos.Y == -1 && bombs1[player1.ActualBomb].Pos.X == -1)){
+                        if(count_bombs(bombs1, maximumBombs) < player1.MaxBombs){
+                            putBomb = true;
+                        }
+                    }
+                    player_action(player1,player2,target1,bombs1,map,portal,putBomb);
+                }
             }
-            if(player2.Alive){
+            if(player2.Alive && !player2.Passed){
                 switch(key){
                     case 72: // Cima
                         target2.Pos.Y--;
@@ -1609,24 +1689,9 @@ int game(InfoType &info){
                         target2.Pos.X++;
                         break;
                 }
-            }
-            player1.Pos.Y += target1.Pos.Y;
-            player1.Pos.X += target1.Pos.X;
-            player2.Pos.Y += target2.Pos.Y;
-            player2.Pos.X += target2.Pos.X;
-            if(key==119 || key==115 || key==97 || key==100 || key==32){
-                if(player1.Alive){
-                    int putBomb = false;
-                    if(key==32 && (map[player1.Pos.Y][player1.Pos.X] == freeBlock) && player1.Invincible == 0 && (bombs1[player1.ActualBomb].Pos.Y == -1 && bombs1[player1.ActualBomb].Pos.X == -1)){
-                        if(count_bombs(bombs1, maximumBombs) < player1.MaxBombs){
-                            putBomb = true;
-                        }
-                    }
-                    player_action(player1,player2,target1,bombs1,map,portal,putBomb);
-                }
-            }
-            if(key==72 || key==80 || key==75 || key==77 || key==13){
-                if(player2.Alive){
+                player2.Pos.Y += target2.Pos.Y;
+                player2.Pos.X += target2.Pos.X;
+                if(key==72 || key==80 || key==75 || key==77 || key==13){
                     int putBomb = false;
                     if(key==13 && (map[player2.Pos.Y][player2.Pos.X] == freeBlock) && player2.Invincible == 0 && (bombs2[player2.ActualBomb].Pos.Y == -1 && bombs2[player2.ActualBomb].Pos.X == -1)){
                         if(count_bombs(bombs2, maximumBombs) < player2.MaxBombs){
@@ -2073,6 +2138,12 @@ int game(InfoType &info){
         }
         if(sound1 == 2 || sound2 == 2){
             morteInimigoSD.play();
+        }
+        if(sound1 == 3 || sound2 == 3){
+            pandoraSD.play();
+        }
+        if(sound1 == 4 || sound2 == 4){
+            om3gaSD.play();
         }
 //-----------------------------------< SISTEMA DAS BOMBAS <-----------------------------------//
 
