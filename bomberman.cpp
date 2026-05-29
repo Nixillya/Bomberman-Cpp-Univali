@@ -473,31 +473,18 @@ bool explode_pandora(int map[mapSizeY][mapSizeX], BombType bomb, PlayerType play
         int y;
         int x;
         bool success = true;
-        while(true){
+        while(success){
             y = rand()%3 - 1;
             x = rand()%3 - 1;
             if(y==0 || x==0){
                 if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == freeBlock || map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock || map[bomb.Pos.Y+y][bomb.Pos.X+x] == explosionBlock){
-                    break;
+                    success = false;
                 }
             }
         }
-        if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == freeBlock){
-            success = false;
-        }
-        if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == fragileBlock){
-            success = false;
-        }
-        if(map[bomb.Pos.Y+y][bomb.Pos.X+x] == explosionBlock){
-            success = false;
-        }
-        if(success){
-            map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
-        }else{
-            map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
-            if(rand()%100==0){
-                return false;
-            }
+        map[bomb.Pos.Y+y][bomb.Pos.X+x] = explosionBlock;
+        if(rand()%100==0){
+            return false;
         }
         bomb.Pos.Y += y;
         bomb.Pos.X += x;
