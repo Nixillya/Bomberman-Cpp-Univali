@@ -1954,25 +1954,28 @@ int game(InfoType &info){
                 boss.Pos.X+=boss.Target.X;
                 
                 if(rand()%2==0){
-                    int doit = rand()%2;
+                    int doit = rand()%3;
                     if(doit==0){
                         if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
                             map[boss.Pos.Y][boss.Pos.X] = freeBlock;
                             boss.Pos.Y-=boss.Target.Y;
                             boss.Pos.X-=boss.Target.X;
                         }
-                    }else{
+                    }
+                    if(doit==1){
                         if(map[boss.Pos.Y][boss.Pos.X]==fragileBlock){
                             map[boss.Pos.Y][boss.Pos.X] = solidBlock;
                             boss.Pos.Y-=boss.Target.Y;
                             boss.Pos.X-=boss.Target.X;
                         }
                     }
-                    if(boss.Pos.Y>0 && boss.Pos.Y<mapSizeY-1 && boss.Pos.X>0 && boss.Pos.X<mapSizeX-1){
-                        if(map[boss.Pos.Y][boss.Pos.X]==solidBlock){
-                            map[boss.Pos.Y][boss.Pos.X] = fragileBlock;
-                            boss.Pos.Y-=boss.Target.Y;
-                            boss.Pos.X-=boss.Target.X;
+                    if(doit==2){
+                        if(boss.Pos.Y>0 && boss.Pos.Y<mapSizeY-1 && boss.Pos.X>0 && boss.Pos.X<mapSizeX-1){
+                            if(map[boss.Pos.Y][boss.Pos.X]==solidBlock){
+                                map[boss.Pos.Y][boss.Pos.X] = fragileBlock;
+                                boss.Pos.Y-=boss.Target.Y;
+                                boss.Pos.X-=boss.Target.X;
+                            }
                         }
                     }
                 }
@@ -2390,6 +2393,7 @@ int main(){
                         musicaDerrotaSD.stop();
                         cout<<"\ec\e[?25l";
                         int deadMenu = -1;
+                        info.phase = 3;
                         if(game(info)){
                             if(info.phase>3){
                                 info.maxPoints = info.player1.Points+info.player2.Points;
