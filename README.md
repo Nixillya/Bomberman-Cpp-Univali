@@ -56,9 +56,4 @@ Este é o código do nosso jogo inspirado em Bomberman, como parte do trabalho d
     ✅ - Ter opção mostrando o Rank Ordenado
     ✅ - Colocar música no jogo
 
-    NOTA: ???
-
-# M3
-    ???
-
-    NOTA: ???
+    NOTA: 10,00
