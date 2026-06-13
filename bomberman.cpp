@@ -1970,11 +1970,13 @@ int game(InfoType &info){
                         }
                     }
                     if(doit==2){
-                        if(boss.Pos.Y>0 && boss.Pos.Y<mapSizeY-1 && boss.Pos.X>0 && boss.Pos.X<mapSizeX-1){
-                            if(map[boss.Pos.Y][boss.Pos.X]==solidBlock){
-                                map[boss.Pos.Y][boss.Pos.X] = fragileBlock;
-                                boss.Pos.Y-=boss.Target.Y;
-                                boss.Pos.X-=boss.Target.X;
+                        if(rand()%2==0){
+                            if(boss.Pos.Y>0 && boss.Pos.Y<mapSizeY-1 && boss.Pos.X>0 && boss.Pos.X<mapSizeX-1){
+                                if(map[boss.Pos.Y][boss.Pos.X]==solidBlock){
+                                    map[boss.Pos.Y][boss.Pos.X] = fragileBlock;
+                                    boss.Pos.Y-=boss.Target.Y;
+                                    boss.Pos.X-=boss.Target.X;
+                                }
                             }
                         }
                     }
